@@ -34,15 +34,15 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Quick actions: duplicate, archive, delete, share
 
 ## Traveler profile
-- [ ] Multi-step wizard, resumable draft
-- [ ] Party composition: solo / couple / family / friends
-- [ ] Children: count + age each
-- [ ] Activity interests multi-select: beach, hiking, sport, museums, food, nature
-- [ ] Global budget input
-- [ ] Destination picker (country / region / city, autocomplete)
-- [ ] Duration / period: fixed dates or flexible
-- [ ] Already-fixed stops and dated constraints ("be in Barcelona on the 12th")
-- [ ] Travel preferences: pace, max driving hours per day, nature vs city, free vs paid spots
+- [x] Multi-step wizard, resumable draft
+- [x] Party composition: solo / couple / family / friends
+- [x] Children: count + age each
+- [x] Activity interests multi-select: beach, hiking, sport, museums, food, nature
+- [x] Global budget input
+- [x] Destination picker (country / region / city, autocomplete)
+- [x] Duration / period: fixed dates or flexible
+- [x] Already-fixed stops and dated constraints ("be in Barcelona on the 12th")
+- [x] Travel preferences: pace, max driving hours per day, nature vs city, free vs paid spots
 - [ ] Edit profile → prompt to re-apply on the active trip
 
 ## Vehicle profile
