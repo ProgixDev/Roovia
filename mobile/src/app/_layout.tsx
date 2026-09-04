@@ -1,4 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
 import { Stack, useSegments } from "expo-router";
 import * as NativeSplash from "expo-splash-screen";
 import { useEffect } from "react";
@@ -8,6 +9,7 @@ import {
   SafeAreaView,
   initialWindowMetrics,
 } from "react-native-safe-area-context";
+import { fontAssets } from "../constants/fonts";
 import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
 import { queryClient } from "../lib/queryClient";
 
@@ -15,12 +17,14 @@ NativeSplash.preventAutoHideAsync();
 NativeSplash.setOptions({ duration: 700, fade: true });
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts(fontAssets);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <RootLayoutWithTheme />
+            <RootLayoutWithTheme fontsLoaded={fontsLoaded} />
           </SafeAreaProvider>
         </ThemeProvider>
       </QueryClientProvider>
@@ -28,13 +32,21 @@ export default function RootLayout() {
   );
 }
 
-function RootLayoutWithTheme() {
+function RootLayoutWithTheme({ fontsLoaded }: { fontsLoaded: boolean }) {
   const { theme } = useTheme();
   const segments = useSegments();
 
   useEffect(() => {
-    NativeSplash.hideAsync();
-  }, []);
+    // Keep the native splash up until the design-system fonts are ready —
+    // otherwise the first frame flashes in the system font.
+    if (fontsLoaded) {
+      NativeSplash.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   // The splash lives at the root `index` route, which is the only route with
   // no segments at all. Deliberately NOT `usePathname() === "/"`: a route
