@@ -1,8 +1,8 @@
 export interface Theme {
   // Legacy 3-field shape — kept because the demo screens (TabDesign1-9,
-  // OnboardingDesign1-6, Skeleton, ThemeVariantPreview...) already consume
-  // it and are already correctly Roovia-colored. New screens should prefer
-  // `colors` below, which carries the full DESIGN.md token set.
+  // Skeleton, ThemeVariantPreview...) already consume it and are already
+  // correctly Roovia-colored. New screens should prefer `colors` below,
+  // which carries the full DESIGN.md token set.
   primary: {
     main: string;
     light: string;
