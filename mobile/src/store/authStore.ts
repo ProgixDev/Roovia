@@ -6,6 +6,9 @@ import { tokenStorage } from "../lib/tokenStorage";
 export interface AuthUser {
   id: string;
   email: string;
+  displayName?: string;
+  username?: string;
+  avatarUri?: string;
 }
 
 interface AuthState {

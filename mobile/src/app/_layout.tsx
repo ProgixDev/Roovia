@@ -1,9 +1,12 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
+import * as NavigationBar from "expo-navigation-bar";
 import { Stack, useSegments } from "expo-router";
 import * as NativeSplash from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Platform } from "react-native";
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -33,7 +36,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutWithTheme({ fontsLoaded }: { fontsLoaded: boolean }) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const segments = useSegments();
 
   useEffect(() => {
@@ -43,6 +46,21 @@ function RootLayoutWithTheme({ fontsLoaded }: { fontsLoaded: boolean }) {
       NativeSplash.hideAsync();
     }
   }, [fontsLoaded]);
+
+  // Both bars are configured transparent at the native level (see
+  // plugins/withTransparent{StatusBar,NavigationBar}.js) — the app's own
+  // background shows through, so only the ICON/button color needs to track
+  // the theme. Without this, icon color never adapts to `isDark` at all:
+  // status bar defaults to a fixed style and nothing sets the nav bar's
+  // button color from JS, so both look fine on whichever mode they happened
+  // to default toward and are unreadable on the other. Onboarding
+  // overrides its own `<StatusBar>` locally (see its file doc) — expo-
+  // status-bar resolves nested instances by last-mounted-wins, so this one
+  // is just the ambient default, not a conflict.
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    NavigationBar.setButtonStyleAsync(isDark ? "light" : "dark").catch(() => {});
+  }, [isDark]);
 
   if (!fontsLoaded) {
     return null;
@@ -74,6 +92,7 @@ function RootLayoutWithTheme({ fontsLoaded }: { fontsLoaded: boolean }) {
       edges={isFullBleed ? [] : ["top"]}
       style={{ flex: 1, backgroundColor: theme.background.dark }}
     >
+      <StatusBar style={isDark ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerShown: false,

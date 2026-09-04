@@ -7,16 +7,16 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 # FRONTEND
 
 ## Auth & account
-- [ ] Welcome screen + first-run carousel (plan / drive / share)
-- [ ] Sign up: email + password
-- [ ] Login + "stay signed in"
-- [ ] Apple Sign-In (mandatory on iOS once any social login exists)
-- [ ] Google Sign-In
+- [x] Welcome screen + first-run carousel (plan / drive / share)
+- [x] Sign up: email + password
+- [x] Login + "stay signed in"
+- [x] Apple Sign-In (mandatory on iOS once any social login exists)
+- [x] Google Sign-In
 - [ ] Email verification screen + resend
-- [ ] Forgot password → reset flow
-- [ ] Token storage in `expo-secure-store`, silent refresh, auto-logout on 401
+- [x] Forgot password → reset flow
+- [x] Token storage in `expo-secure-store`, silent refresh, auto-logout on 401
 - [ ] Guest mode: browse, blocked at trip generation → signup wall
-- [ ] Account screen: change email, change password, avatar, display name
+- [x] Account screen: change email, change password, avatar, display name
 - [ ] Connected devices / sessions list + revoke
 - [ ] Delete account with confirmation (store requirement)
 - [ ] Consent gates: CGU, privacy policy, location permission rationale, analytics opt-in

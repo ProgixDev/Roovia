@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Dimensions,
   Image,
@@ -9,6 +10,7 @@ import {
   type ImageSourcePropType,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -381,8 +383,21 @@ function SlideContent({ slide, insetTop, insetBottom }: SlideContentProps) {
 export default function OnboardingRoute() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const markSeen = useOnboardingStore((s) => s.markSeen);
+
+  // Matches the fixed `<StatusBar style="dark">` below, for the same
+  // reason (see the file doc's "Fixed palette" section) — the bottom nav
+  // bar sits over the same saturated photo. Restored to whatever the app's
+  // actual theme wants on unmount, or it would leak "dark" into whichever
+  // screen comes next regardless of that screen's own theme.
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    NavigationBar.setButtonStyleAsync("dark").catch(() => {});
+    return () => {
+      NavigationBar.setButtonStyleAsync(isDark ? "light" : "dark").catch(() => {});
+    };
+  }, [isDark]);
   const [index, setIndex] = useState(0);
   const scrollRef = useRef<Animated.ScrollView>(null);
   const scrollX = useSharedValue(0);
@@ -422,7 +437,7 @@ export default function OnboardingRoute() {
 
   const finish = () => {
     markSeen();
-    router.replace("/(tabs)" as any);
+    router.replace("/auth" as any);
   };
 
   /**
