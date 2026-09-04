@@ -19,7 +19,7 @@ export default function ForgotPasswordScreen() {
 
   const submit = async () => {
     if (!isValidEmail(email)) {
-      setError("Enter a valid email address");
+      setError("Entrez une adresse e-mail valide");
       return;
     }
     setError(undefined);
@@ -33,31 +33,35 @@ export default function ForgotPasswordScreen() {
     return (
       <AuthLayout
         showBack
-        title="Check your email"
+        title="Vérifiez vos e-mails"
         // Phrased the same way the real backend does — it never reveals
         // whether an address is actually registered.
-        subtitle={`If an account exists for ${email}, a reset link is on its way.`}
+        subtitle={`Si un compte existe pour ${email}, un lien de réinitialisation est en route.`}
       >
         {/* No real email in this prototype — "Continue" stands in for
             tapping the emailed link. */}
-        <Button label="Continue" onPress={() => router.push("/auth/reset-password" as any)} />
+        <Button label="Continuer" onPress={() => router.push("/auth/reset-password" as any)} />
       </AuthLayout>
     );
   }
 
   return (
-    <AuthLayout showBack title="Reset your password" subtitle="We'll send a link to reset it.">
+    <AuthLayout
+      showBack
+      title="Réinitialiser votre mot de passe"
+      subtitle="Nous allons vous envoyer un lien pour le réinitialiser."
+    >
       <TextField
-        label="Email"
+        label="E-mail"
         value={email}
         onChangeText={setEmail}
         error={error}
         autoCapitalize="none"
         keyboardType="email-address"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder="vous@exemple.com"
       />
-      <Button label="Send reset link" onPress={submit} loading={submitting} />
+      <Button label="Envoyer le lien" onPress={submit} loading={submitting} />
     </AuthLayout>
   );
 }

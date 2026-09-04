@@ -22,9 +22,9 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [ ] Consent gates: CGU, privacy policy, location permission rationale, analytics opt-in
 
 ## Onboarding
-- [ ] Post-signup flow: traveler profile → vehicle → first trip prompt
-- [ ] Skippable, resumable, progress indicator
-- [ ] "Why we ask this" hints so the AI-personalization value is visible
+- [x] Post-signup flow: traveler profile → vehicle → first trip prompt
+- [x] Skippable, resumable, progress indicator
+- [x] "Why we ask this" hints so the AI-personalization value is visible
 
 ## Home / trips
 - [ ] Trips list: upcoming, in progress, past, drafts

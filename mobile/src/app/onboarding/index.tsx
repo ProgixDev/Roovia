@@ -147,20 +147,20 @@ const SLIDES: SlideConfig[] = [
   {
     photo: require("../../../assets/images/onboarding/onboarding-plan.png"),
     bg: "#E54A01",
-    title: "Plan your road\ntrip",
-    body: "Tell us where you're headed and what you drive — the route, the stops and the budget come back already planned.",
+    title: "Préparez votre\nroad trip",
+    body: "Dites-nous où vous allez et ce que vous conduisez — l'itinéraire, les étapes et le budget reviennent déjà planifiés.",
   },
   {
     photo: require("../../../assets/images/onboarding/onboarding-drive.png"),
     bg: "#145A76",
-    title: "The road\nadapts to you",
-    body: "Fuel, water, dump stations, wherever the road turns next — recalculated the moment your plans change.",
+    title: "La route\ns'adapte à vous",
+    body: "Carburant, eau, vidange, à chaque tournant — recalculé dès que vos plans changent.",
   },
   {
     photo: require("../../../assets/images/onboarding/onboarding-share.png"),
     bg: "#495026",
-    title: "Share the\njourney",
-    body: "Log the road as you go, then share the whole story with everyone who wasn't there for it.",
+    title: "Partagez le\nvoyage",
+    body: "Gardez une trace du trajet, puis partagez toute l'histoire avec ceux qui n'y étaient pas.",
   },
 ];
 
@@ -575,7 +575,7 @@ export default function OnboardingRoute() {
             hitSlop={14}
             style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
           >
-            <Text style={styles.skip}>Skip</Text>
+            <Text style={styles.skip}>Passer</Text>
           </Pressable>
         </View>
 

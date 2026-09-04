@@ -30,8 +30,8 @@ export default function SignUpScreen() {
 
   const submit = async () => {
     const nextErrors: FormErrors = {};
-    if (!isValidEmail(email)) nextErrors.email = "Enter a valid email address";
-    if (password.length < 8) nextErrors.password = "Password must be at least 8 characters";
+    if (!isValidEmail(email)) nextErrors.email = "Entrez une adresse e-mail valide";
+    if (password.length < 8) nextErrors.password = "Le mot de passe doit contenir au moins 8 caractères";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
@@ -42,48 +42,50 @@ export default function SignUpScreen() {
     await new Promise((resolve) => setTimeout(resolve, 600));
     await login({ id: `mock-${Date.now()}`, email }, "mock-access-token", "mock-refresh-token");
     setSubmitting(false);
-    router.replace("/(tabs)" as any);
+    // Fresh account → the post-signup setup wizard, not straight to the app.
+    // Log-in (an existing account) skips it — see setup/traveler.tsx's doc.
+    router.replace("/setup/traveler" as any);
   };
 
   return (
     <AuthLayout
       showBack
-      title="Create your account"
-      subtitle="Plan the route, we'll handle the rest."
+      title="Créer votre compte"
+      subtitle="Planifiez l'itinéraire, on s'occupe du reste."
       footer={
         <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 24 }}>
           <Text style={[typography.body, { color: theme.colors.inkMuted }]}>
-            Already have an account?{" "}
+            Vous avez déjà un compte ?{" "}
           </Text>
           <Text
             onPress={() => router.replace("/auth/log-in" as any)}
             style={[typography.button, { color: theme.colors.blaze }]}
           >
-            Log in
+            Se connecter
           </Text>
         </View>
       }
     >
       <TextField
-        label="Email"
+        label="E-mail"
         value={email}
         onChangeText={setEmail}
         error={errors.email}
         autoCapitalize="none"
         keyboardType="email-address"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder="vous@exemple.com"
       />
       <TextField
-        label="Password"
+        label="Mot de passe"
         secure
         value={password}
         onChangeText={setPassword}
         error={errors.password}
-        placeholder="At least 8 characters"
+        placeholder="8 caractères minimum"
         autoComplete="new-password"
       />
-      <Button label="Sign up" onPress={submit} loading={submitting} />
+      <Button label="S'inscrire" onPress={submit} loading={submitting} />
     </AuthLayout>
   );
 }

@@ -31,9 +31,10 @@ function GoogleGlyph() {
  * from here (not `replace`d), so their back button correctly returns here.
  *
  * Apple/Google are mocked the same way email is (no real OAuth SDK yet),
- * just tagged with a provider-specific placeholder identity. Both brand
- * buttons use Apple/Google's own fixed white-outlined styling — a real
- * external requirement, not a themed `colors.surface` — so they don't
+ * each into a fixed demo account rather than a fresh one per tap — see
+ * `continueWith` for why Apple and Google land in different places. Both
+ * brand buttons use Apple/Google's own fixed white-outlined styling — a
+ * real external requirement, not a themed `colors.surface` — so they don't
  * shift with the app's light/dark theme.
  */
 export default function AuthChooserScreen() {
@@ -42,11 +43,33 @@ export default function AuthChooserScreen() {
   const login = useAuthStore((s) => s.login);
   const [loading, setLoading] = useState<Provider | null>(null);
 
+  // Each provider demos a different account state, matching the two ways
+  // email already works: Apple signs into a brand-new demo account and
+  // goes through the setup wizard, same as sign-up. Google signs into an
+  // existing demo account (already has a name) straight into the app,
+  // same as log-in.
   const continueWith = async (provider: Provider) => {
     setLoading(provider);
     await new Promise((resolve) => setTimeout(resolve, 600));
+
+    if (provider === "apple") {
+      await login(
+        { id: "demo-apple", email: "apple-demo@roovia.app" },
+        "mock-access-token",
+        "mock-refresh-token",
+      );
+      setLoading(null);
+      router.replace("/setup/traveler" as any);
+      return;
+    }
+
     await login(
-      { id: `mock-${provider}-${Date.now()}`, email: `${provider}-user@example.com` },
+      {
+        id: "demo-google",
+        email: "google-demo@roovia.app",
+        displayName: "Alex Rivera",
+        username: "alexrivera",
+      },
       "mock-access-token",
       "mock-refresh-token",
     );
@@ -55,7 +78,7 @@ export default function AuthChooserScreen() {
   };
 
   return (
-    <AuthLayout logo title="Welcome to Roovia" subtitle="Your next road trip starts here.">
+    <AuthLayout logo title="Bienvenue sur Roovia" subtitle="Votre prochain road trip commence ici.">
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ disabled: loading !== null, busy: loading === "apple" }}
@@ -72,7 +95,7 @@ export default function AuthChooserScreen() {
       >
         <Ionicons name="logo-apple" size={20} color="#1F1F1F" />
         <Text style={styles.brandLabel}>
-          {loading === "apple" ? "Continuing…" : "Continue with Apple"}
+          {loading === "apple" ? "Connexion…" : "Continuer avec Apple"}
         </Text>
       </Pressable>
 
@@ -92,17 +115,17 @@ export default function AuthChooserScreen() {
       >
         <GoogleGlyph />
         <Text style={styles.brandLabel}>
-          {loading === "google" ? "Continuing…" : "Continue with Google"}
+          {loading === "google" ? "Connexion…" : "Continuer avec Google"}
         </Text>
       </Pressable>
 
       <View style={styles.dividerRow}>
         <View style={[styles.dividerLine, { backgroundColor: theme.colors.line }]} />
-        <Text style={[typography.caption, { color: theme.colors.inkMuted }]}>or</Text>
+        <Text style={[typography.caption, { color: theme.colors.inkMuted }]}>ou</Text>
         <View style={[styles.dividerLine, { backgroundColor: theme.colors.line }]} />
       </View>
 
-      <Button label="Continue with email" onPress={() => router.push("/auth/sign-up" as any)} />
+      <Button label="Continuer avec l'e-mail" onPress={() => router.push("/auth/sign-up" as any)} />
     </AuthLayout>
   );
 }

@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import {
   Archive,
-  ArrowRotateLeft,
   Bookmark,
   Calendar,
   Chart2,
@@ -11,6 +10,7 @@ import {
   Home2,
   Layer,
   Location,
+  Logout,
   Notification,
   People,
   Setting2,
@@ -23,7 +23,7 @@ import {
   type ActionConfig,
   type TabConfig,
 } from "../../components/screens/tabs/TabDesign9";
-import { useOnboardingStore } from "../../store/onboardingStore";
+import { useAuthStore } from "../../store/authStore";
 
 // The route list. The bar's look lives in the TabDesign* component — swap the
 // single import above (TabDesign1 … 9) to reskin without touching this.
@@ -62,23 +62,20 @@ const DESTINATION_ACTIONS: ActionConfig[] = [
 
 export default function TabLayout() {
   const router = useRouter();
-  const resetOnboarding = useOnboardingStore((s) => s.reset);
+  const logout = useAuthStore((s) => s.logout);
 
-  // A dev/preview affordance, not a destination like the rest of the grid —
-  // clears the "seen" flag (so onboarding shows again on the next cold
-  // start too, not just this tap) and jumps straight there to preview it
-  // without restarting the app. Built here rather than in
-  // `DESTINATION_ACTIONS` because it needs `useRouter`/`useOnboardingStore`,
-  // which only work inside the component.
+  // A real destination, not a preview one like the rest of the grid — built
+  // here rather than in `DESTINATION_ACTIONS` because it needs
+  // `useRouter`/`useAuthStore`, which only work inside the component.
   const actions: ActionConfig[] = [
     ...DESTINATION_ACTIONS,
     {
-      key: "reset-onboarding",
-      label: "Onboarding",
-      icon: ArrowRotateLeft,
-      onPress: () => {
-        resetOnboarding();
-        router.push("/onboarding" as any);
+      key: "log-out",
+      label: "Se déconnecter",
+      icon: Logout,
+      onPress: async () => {
+        await logout();
+        router.replace("/auth/log-in" as any);
       },
     },
   ];

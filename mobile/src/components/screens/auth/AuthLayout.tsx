@@ -54,7 +54,9 @@ export function AuthLayout({ title, subtitle, showBack, logo, children, footer }
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 },
+          // Not `insets.top` — the root layout's own SafeAreaView already
+          // reserves it for every non-full-bleed route, this one included.
+          { paddingTop: 16, paddingBottom: insets.bottom + 24 },
         ]}
         keyboardShouldPersistTaps="handled"
       >

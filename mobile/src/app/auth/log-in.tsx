@@ -30,8 +30,8 @@ export default function LogInScreen() {
 
   const submit = async () => {
     const nextErrors: FormErrors = {};
-    if (!isValidEmail(email)) nextErrors.email = "Enter a valid email address";
-    if (password.length < 1) nextErrors.password = "Enter your password";
+    if (!isValidEmail(email)) nextErrors.email = "Entrez une adresse e-mail valide";
+    if (password.length < 1) nextErrors.password = "Entrez votre mot de passe";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
@@ -45,48 +45,48 @@ export default function LogInScreen() {
   return (
     <AuthLayout
       showBack
-      title="Welcome back"
-      subtitle="Log in to pick up where you left off."
+      title="Ravi de vous revoir"
+      subtitle="Connectez-vous pour reprendre là où vous en étiez."
       footer={
         <View style={{ gap: 16, marginTop: 24 }}>
           <Text
             onPress={() => router.push("/auth/forgot-password" as any)}
             style={[typography.button, { textAlign: "center", color: theme.colors.lake }]}
           >
-            Forgot password?
+            Mot de passe oublié ?
           </Text>
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
-            <Text style={[typography.body, { color: theme.colors.inkMuted }]}>New here? </Text>
+            <Text style={[typography.body, { color: theme.colors.inkMuted }]}>Nouveau ici ? </Text>
             <Text
               onPress={() => router.replace("/auth/sign-up" as any)}
               style={[typography.button, { color: theme.colors.blaze }]}
             >
-              Create an account
+              Créer un compte
             </Text>
           </View>
         </View>
       }
     >
       <TextField
-        label="Email"
+        label="E-mail"
         value={email}
         onChangeText={setEmail}
         error={errors.email}
         autoCapitalize="none"
         keyboardType="email-address"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder="vous@exemple.com"
       />
       <TextField
-        label="Password"
+        label="Mot de passe"
         secure
         value={password}
         onChangeText={setPassword}
         error={errors.password}
-        placeholder="Your password"
+        placeholder="Votre mot de passe"
         autoComplete="password"
       />
-      <Button label="Log in" onPress={submit} loading={submitting} />
+      <Button label="Se connecter" onPress={submit} loading={submitting} />
     </AuthLayout>
   );
 }

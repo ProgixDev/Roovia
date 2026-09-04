@@ -63,7 +63,7 @@ export default function AccountScreen() {
 
   const changePassword = async () => {
     if (newPassword.length < 8) {
-      Alert.alert("Password too short", "New password must be at least 8 characters.");
+      Alert.alert("Mot de passe trop court", "Le nouveau mot de passe doit contenir au moins 8 caractères.");
       return;
     }
     setPasswordSaving(true);
@@ -71,7 +71,7 @@ export default function AccountScreen() {
     setPasswordSaving(false);
     setCurrentPassword("");
     setNewPassword("");
-    Alert.alert("Password updated");
+    Alert.alert("Mot de passe mis à jour");
   };
 
   const handleLogout = async () => {
@@ -83,7 +83,9 @@ export default function AccountScreen() {
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.ground }}
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
+        // Not `insets.top` — the root layout's own SafeAreaView already
+        // reserves it for every non-full-bleed route, this one included.
+        paddingTop: 16,
         paddingBottom: insets.bottom + 32,
         paddingHorizontal: 26,
       }}
@@ -93,7 +95,7 @@ export default function AccountScreen() {
       </Pressable>
 
       <Text style={[typography.sectionHead, { color: theme.colors.ink, marginBottom: 24 }]}>
-        Account
+        Compte
       </Text>
 
       <View style={styles.avatarRow}>
@@ -103,58 +105,58 @@ export default function AccountScreen() {
           </Text>
         </View>
         <Pressable
-          onPress={() => Alert.alert("Coming soon", "Photo upload isn't wired up yet.")}
+          onPress={() => Alert.alert("Bientôt disponible", "L'ajout de photo n'est pas encore disponible.")}
           hitSlop={10}
         >
-          <Text style={[typography.button, { color: theme.colors.lake }]}>Change photo</Text>
+          <Text style={[typography.button, { color: theme.colors.lake }]}>Changer la photo</Text>
         </Pressable>
       </View>
 
       <Text style={[typography.caption, styles.sectionLabel, { color: theme.colors.inkMuted }]}>
-        Profile
+        Profil
       </Text>
       <View style={styles.form}>
         <TextField
-          label="Display name"
+          label="Nom affiché"
           value={displayName}
           onChangeText={setDisplayName}
-          placeholder="Add a name"
+          placeholder="Ajouter un nom"
         />
         <TextField
-          label="Username"
+          label="Nom d'utilisateur"
           value={username}
           onChangeText={setUsername}
-          placeholder="Add a username"
+          placeholder="Ajouter un nom d'utilisateur"
           autoCapitalize="none"
         />
-        <TextField label="Email" value={user.email} editable={false} />
-        <Button label="Save changes" variant="secondary" onPress={saveProfile} loading={saving} />
+        <TextField label="E-mail" value={user.email} editable={false} />
+        <Button label="Enregistrer" variant="secondary" onPress={saveProfile} loading={saving} />
       </View>
 
       <Text
         style={[typography.caption, styles.sectionLabel, { color: theme.colors.inkMuted, marginTop: 32 }]}
       >
-        Password
+        Mot de passe
       </Text>
       <View style={styles.form}>
         <TextField
-          label="Current password"
+          label="Mot de passe actuel"
           secure
           value={currentPassword}
           onChangeText={setCurrentPassword}
-          placeholder="Current password"
+          placeholder="Mot de passe actuel"
           autoComplete="password"
         />
         <TextField
-          label="New password"
+          label="Nouveau mot de passe"
           secure
           value={newPassword}
           onChangeText={setNewPassword}
-          placeholder="At least 8 characters"
+          placeholder="8 caractères minimum"
           autoComplete="new-password"
         />
         <Button
-          label="Update password"
+          label="Mettre à jour le mot de passe"
           variant="secondary"
           onPress={changePassword}
           loading={passwordSaving}
@@ -162,7 +164,7 @@ export default function AccountScreen() {
       </View>
 
       <View style={{ marginTop: 40 }}>
-        <Button label="Log out" variant="secondary" onPress={handleLogout} />
+        <Button label="Se déconnecter" variant="secondary" onPress={handleLogout} />
       </View>
     </ScrollView>
   );

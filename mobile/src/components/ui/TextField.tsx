@@ -98,9 +98,16 @@ export function TextField({
 const styles = StyleSheet.create({
   wrap: { gap: 8 },
   box: {
-    height: 54,
+    // `minHeight`, not `height`: a fixed height clips or overflows the input
+    // whenever a caller passes a taller `style` (multiline, e.g. trip.tsx's
+    // idea field) — the input grows past a fixed-height box instead of the
+    // box growing with it, which is what put text on top of the label
+    // above. `minHeight` still gives single-line fields their usual size,
+    // since their natural content is well under it.
+    minHeight: 54,
     borderRadius: radius.sm,
     paddingHorizontal: 16,
+    paddingVertical: 14,
     justifyContent: "center",
   },
   input: { padding: 0 },

@@ -21,8 +21,8 @@ export default function ResetPasswordScreen() {
 
   const submit = async () => {
     const nextErrors: FormErrors = {};
-    if (password.length < 8) nextErrors.password = "Password must be at least 8 characters";
-    if (confirm !== password) nextErrors.confirm = "Passwords don't match";
+    if (password.length < 8) nextErrors.password = "Le mot de passe doit contenir au moins 8 caractères";
+    if (confirm !== password) nextErrors.confirm = "Les mots de passe ne correspondent pas";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
@@ -36,33 +36,33 @@ export default function ResetPasswordScreen() {
     return (
       // A reset drops every session on the real backend — landing back on
       // log-in, not an auto-login, matches that.
-      <AuthLayout title="Password updated" subtitle="Log in with your new password.">
-        <Button label="Back to log in" onPress={() => router.replace("/auth/log-in" as any)} />
+      <AuthLayout title="Mot de passe mis à jour" subtitle="Connectez-vous avec votre nouveau mot de passe.">
+        <Button label="Retour à la connexion" onPress={() => router.replace("/auth/log-in" as any)} />
       </AuthLayout>
     );
   }
 
   return (
-    <AuthLayout showBack title="Set a new password">
+    <AuthLayout showBack title="Choisissez un nouveau mot de passe">
       <TextField
-        label="New password"
+        label="Nouveau mot de passe"
         secure
         value={password}
         onChangeText={setPassword}
         error={errors.password}
-        placeholder="At least 8 characters"
+        placeholder="8 caractères minimum"
         autoComplete="new-password"
       />
       <TextField
-        label="Confirm password"
+        label="Confirmer le mot de passe"
         secure
         value={confirm}
         onChangeText={setConfirm}
         error={errors.confirm}
-        placeholder="Re-enter password"
+        placeholder="Ressaisissez le mot de passe"
         autoComplete="new-password"
       />
-      <Button label="Update password" onPress={submit} loading={submitting} />
+      <Button label="Mettre à jour le mot de passe" onPress={submit} loading={submitting} />
     </AuthLayout>
   );
 }

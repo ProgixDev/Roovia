@@ -18,14 +18,6 @@ interface OnboardingState {
   hydrate(): Promise<void>;
   /** Marks onboarding as seen — call on "Skip" or the final slide's CTA alike. */
   markSeen(): Promise<void>;
-  /**
-   * Clears the seen flag so onboarding shows again on the next cold start,
-   * and lets a caller navigate straight to `/onboarding` to preview it
-   * immediately without restarting the app. A dev/preview affordance — see
-   * its wiring in `app/(tabs)/_layout.tsx` — not something an end user's
-   * flow calls.
-   */
-  reset(): Promise<void>;
 }
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
@@ -50,16 +42,6 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     } catch {
       // Best-effort persistence — the in-memory flag above already lets the
       // user through for this session even if the write fails.
-    }
-  },
-
-  async reset() {
-    set({ hasSeenOnboarding: false });
-    try {
-      await AsyncStorage.removeItem(ONBOARDING_SEEN_KEY);
-    } catch {
-      // Best-effort, same as `markSeen` — the in-memory flag above is
-      // already correct for this session even if the write fails.
     }
   },
 }));
