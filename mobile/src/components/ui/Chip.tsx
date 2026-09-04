@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Pressable, PressableProps, StyleSheet, Text } from "react-native";
 
 import { radius } from "../../constants/themes";
@@ -13,6 +14,8 @@ export interface ChipProps extends Omit<PressableProps, "style" | "onPress"> {
    * and filled-blaze there would visually compete with the screen's actual
    * primary action instead of reading as a neutral toggle. */
   tone?: "blaze" | "ink";
+  /** Leading icon — e.g. interest chips (plage, randonnée…). */
+  icon?: keyof typeof Ionicons.glyphMap;
   onPress?: () => void;
 }
 
@@ -22,10 +25,11 @@ export interface ChipProps extends Omit<PressableProps, "style" | "onPress"> {
  * single-select group is just several of these with one `selected` at a
  * time — no separate group component needed.
  */
-export function Chip({ label, selected, tone = "blaze", onPress, ...props }: ChipProps) {
+export function Chip({ label, selected, tone = "blaze", icon, onPress, ...props }: ChipProps) {
   const { theme } = useTheme();
   const fill = tone === "blaze" ? theme.colors.blaze : theme.colors.ink;
   const onFill = tone === "blaze" ? theme.colors.blazeInk : theme.colors.ground;
+  const textColor = selected ? onFill : theme.colors.ink;
 
   return (
     <Pressable
@@ -42,9 +46,8 @@ export function Chip({ label, selected, tone = "blaze", onPress, ...props }: Chi
       ]}
       {...props}
     >
-      <Text style={[typography.button, { color: selected ? onFill : theme.colors.ink }]}>
-        {label}
-      </Text>
+      {icon ? <Ionicons name={icon} size={16} color={textColor} style={styles.icon} /> : null}
+      <Text style={[typography.button, { color: textColor }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -55,7 +58,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: radius.pill,
     borderWidth: 1,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
+  icon: { marginRight: 6 },
 });

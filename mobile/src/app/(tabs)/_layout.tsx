@@ -1,84 +1,21 @@
 import { useRouter } from "expo-router";
-import {
-  Archive,
-  Bookmark,
-  Calendar,
-  Chart2,
-  Clock,
-  Gallery,
-  Global,
-  Home2,
-  Layer,
-  Location,
-  Logout,
-  Notification,
-  People,
-  Setting2,
-  Task,
-  Wallet,
-} from "iconsax-react-native";
+import { Global, Home2, Map, Profile } from "iconsax-react-native";
 
-import {
-  TabDesign9 as TabDesign,
-  type ActionConfig,
-  type TabConfig,
-} from "../../components/screens/tabs/TabDesign9";
-import { useAuthStore } from "../../store/authStore";
+import { TabBar, type TabConfig } from "../../features/navigation/TabBar";
 
-// The route list. The bar's look lives in the TabDesign* component — swap the
-// single import above (TabDesign1 … 9) to reskin without touching this.
-//
-// `name` is the route's identity, not its label: it must match a file in this
-// folder and be unique across the list. `title` is also the visible label
-// under each icon.
+// Voyages · Carte · [+] · Communauté · Profil — the approved 4-tab IA (see
+// IMPLEMENTATION_PLAN.md §0.1). Everything trip-scoped (itinerary, budget,
+// expenses, checklist, journal, group) lives inside trip detail instead of
+// the tab bar; everything account-scoped lives inside Profil.
 const TABS: TabConfig[] = [
-  { name: "index", title: "Home", icon: Home2 },
-  { name: "tab1", title: "Inbox", icon: Archive },
-  { name: "tab2", title: "Alerts", icon: Notification, badge: 1 },
-  { name: "tab3", title: "Layers", icon: Layer },
-];
-
-// The overflow tabs the `+` button reveals — destinations that didn't fit in
-// the bar, not commands. `key` is a plain list key, NOT a route file: none of
-// these has a screen yet, so `onPress` is left unset and a tap just closes
-// the grid. Give one `onPress: () => router.push("/…")` once its screen
-// exists — or promote it into `TABS` above if it earns a permanent slot.
-//
-// Module-level, unlike the "Onboarding" entry below it: these need no hook,
-// so there's no reason to rebuild this array on every render.
-const DESTINATION_ACTIONS: ActionConfig[] = [
-  { key: "calendar", label: "Calendar", icon: Calendar },
-  { key: "tasks", label: "Tasks", icon: Task },
-  { key: "stats", label: "Stats", icon: Chart2 },
-  { key: "people", label: "People", icon: People },
-  { key: "gallery", label: "Gallery", icon: Gallery },
-  { key: "saved", label: "Saved", icon: Bookmark },
-  { key: "history", label: "History", icon: Clock },
-  { key: "places", label: "Places", icon: Location },
-  { key: "wallet", label: "Wallet", icon: Wallet },
-  { key: "explore", label: "Explore", icon: Global },
-  { key: "settings", label: "Settings", icon: Setting2 },
+  { name: "index", title: "Voyages", icon: Home2 },
+  { name: "carte", title: "Carte", icon: Map },
+  { name: "communaute", title: "Communauté", icon: Global },
+  { name: "profil", title: "Profil", icon: Profile },
 ];
 
 export default function TabLayout() {
   const router = useRouter();
-  const logout = useAuthStore((s) => s.logout);
 
-  // A real destination, not a preview one like the rest of the grid — built
-  // here rather than in `DESTINATION_ACTIONS` because it needs
-  // `useRouter`/`useAuthStore`, which only work inside the component.
-  const actions: ActionConfig[] = [
-    ...DESTINATION_ACTIONS,
-    {
-      key: "log-out",
-      label: "Se déconnecter",
-      icon: Logout,
-      onPress: async () => {
-        await logout();
-        router.replace("/auth/log-in" as any);
-      },
-    },
-  ];
-
-  return <TabDesign tabs={TABS} actions={actions} />;
+  return <TabBar tabs={TABS} onPressFab={() => router.push("/generate" as any)} />;
 }

@@ -103,6 +103,7 @@ function RootLayoutWithTheme({ fontsLoaded }: { fontsLoaded: boolean }) {
         <Stack.Screen name="index" options={{ animation: "fade" }} />
         <Stack.Screen name="onboarding/index" options={{ animation: "fade" }} />
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
+        <Stack.Screen name="generate" options={{ presentation: "modal" }} />
       </Stack>
     </SafeAreaView>
   );
