@@ -46,13 +46,13 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [ ] Edit profile → prompt to re-apply on the active trip
 
 ## Vehicle profile
-- [ ] Type: van, fourgon, camping-car, converted heavy truck, converted car
-- [ ] Dimensions: height, length, width, weight (metric / imperial)
-- [ ] Toilet on board yes/no + type
-- [ ] Equipment: shower, fresh water tank, grey/black tank, solar, fridge
-- [ ] Autonomy: water capacity, tank capacity, fuel type, consumption
-- [ ] Specific needs: 220V hookup, dump station every N days
-- [ ] Garage of several vehicles + active one
+- [x] Type: van, fourgon, camping-car, converted heavy truck, converted car
+- [x] Dimensions: height, length, width, weight (metric / imperial)
+- [x] Toilet on board yes/no + type
+- [x] Equipment: shower, fresh water tank, grey/black tank, solar, fridge
+- [x] Autonomy: water capacity, tank capacity, fuel type, consumption
+- [x] Specific needs: 220V hookup, dump station every N days
+- [x] Garage of several vehicles + active one
 - [ ] Incompatibility banner when a route or spot doesn't fit the vehicle
 
 ## AI trip generation

@@ -4,6 +4,9 @@ import SplashScreen from "../components/ui/SplashScreen";
 import { useAuthStore } from "../store/authStore";
 import { useOnboardingStore } from "../store/onboardingStore";
 import { useProfileStore } from "../store/profileStore";
+import { useSettingsStore } from "../store/settingsStore";
+import { useTravelerProfileStore } from "../store/travelerProfileStore";
+import { useVehiclesStore } from "../store/vehiclesStore";
 
 const SETUP_ROUTES = ["/setup/traveler", "/setup/vehicle", "/setup/trip"] as const;
 
@@ -16,12 +19,24 @@ export default function Index() {
   const setupStatus = useProfileStore((s) => s.status);
   const setupStep = useProfileStore((s) => s.step);
   const hydrateProfile = useProfileStore((s) => s.hydrate);
+  const hydrateTravelerProfile = useTravelerProfileStore((s) => s.hydrate);
+  const hydrateVehicles = useVehiclesStore((s) => s.hydrate);
+  const hydrateSettings = useSettingsStore((s) => s.hydrate);
 
   useEffect(() => {
     hydrateOnboarding();
     hydrateAuth();
-    hydrateProfile();
-  }, [hydrateOnboarding, hydrateAuth, hydrateProfile]);
+    hydrateVehicles();
+    hydrateSettings();
+    // Sequenced, not fired in parallel: `hydrateTravelerProfile` reads
+    // `profileStore`'s state to seed itself on a first run (see that
+    // store's own doc), so it has to wait for that read to actually land
+    // instead of racing it and seeding from still-default values.
+    (async () => {
+      await hydrateProfile();
+      await hydrateTravelerProfile();
+    })();
+  }, [hydrateOnboarding, hydrateAuth, hydrateProfile, hydrateTravelerProfile, hydrateVehicles, hydrateSettings]);
 
   const handleSplashComplete = () => {
     // `hasSeenOnboarding`/`isAuthenticated` can still be at their initial
