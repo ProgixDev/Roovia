@@ -1,0 +1,14 @@
+{
+  "name": "roovia-monorepo",
+  "private": true,
+  "scripts": {
+    "install:all": "cd mobile && bun install && cd ../server && bun install && cd ../web && bun install",
+    "mobile": "cd mobile && npx expo run:android",
+    "rebuild": "cd mobile && npx expo prebuild --platform android --clean",
+    "apk": "cd mobile && npx expo prebuild --platform android && cd android && .\\gradlew.bat assembleRelease",
+    "aab": "cd mobile && npx expo prebuild --platform android && cd android && .\\gradlew.bat bundleRelease",
+    "server": "cd server && bun run dev",
+    "web": "cd web && bun run dev",
+    "dev": "cd mobile && bun run dev"
+  }
+}

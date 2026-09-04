@@ -1,0 +1,18 @@
+<svg width="390" height="844" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="blur" x="-180" y="-180" width="750" height="1204" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="46"/>
+    </filter>
+    <radialGradient id="wash" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(194 392) rotate(90) scale(520 310)">
+      <stop stop-color="#1E1A27"/>
+      <stop offset="1" stop-color="#141218"/>
+    </radialGradient>
+  </defs>
+  <rect width="390" height="844" fill="url(#wash)"/>
+  <g filter="url(#blur)" opacity=".6">
+    <circle cx="4" cy="52" r="128" fill="#8F68C9"/>
+    <circle cx="379" cy="390" r="144" fill="#6F3C75"/>
+    <circle cx="-28" cy="655" r="118" fill="#5F3C75"/>
+  </g>
+  <circle cx="195" cy="418" r="224" fill="#D0BCFF" fill-opacity=".025"/>
+</svg>
