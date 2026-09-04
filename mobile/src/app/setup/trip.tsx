@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
-import { SetupLayout } from "../../components/screens/setup/SetupLayout";
+import { SetupLayout } from "../../features/setup/SetupLayout";
 import { Button } from "../../components/ui/Button";
 import { TextField } from "../../components/ui/TextField";
 import { useProfileStore } from "../../store/profileStore";

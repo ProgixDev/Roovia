@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
-import { AuthLayout } from "../../components/screens/auth/AuthLayout";
+import { AuthLayout } from "../../features/auth/AuthLayout";
 import { Button } from "../../components/ui/Button";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";

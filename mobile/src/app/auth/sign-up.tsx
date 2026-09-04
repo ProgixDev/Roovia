@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 
-import { AuthLayout } from "../../components/screens/auth/AuthLayout";
+import { AuthLayout } from "../../features/auth/AuthLayout";
 import { Button } from "../../components/ui/Button";
 import { TextField } from "../../components/ui/TextField";
 import { typography } from "../../constants/typography";

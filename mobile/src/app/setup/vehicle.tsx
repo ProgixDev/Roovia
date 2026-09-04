@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
-import { SetupLayout } from "../../components/screens/setup/SetupLayout";
+import { SetupLayout } from "../../features/setup/SetupLayout";
 import { Button } from "../../components/ui/Button";
 import { Chip } from "../../components/ui/Chip";
 import { FieldGroup } from "../../components/ui/FieldGroup";

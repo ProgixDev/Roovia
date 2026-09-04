@@ -4,10 +4,10 @@ import { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { radius } from "../../../constants/themes";
-import { typography } from "../../../constants/typography";
-import { useTheme } from "../../../contexts/ThemeContext";
-import { useProfileStore, type SetupStep } from "../../../store/profileStore";
+import { radius } from "../../constants/themes";
+import { typography } from "../../constants/typography";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useProfileStore, type SetupStep } from "../../store/profileStore";
 
 const STEP_COUNT = 3;
 
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
   },
   hintText: { flex: 1 },
   form: { marginTop: 32, gap: 28 },
-  // The fixed bar itself — hairline top border is what visually separates
   // Opaque background only — no border. That's still what keeps content
   // scrolled up underneath from showing through; a dividing line on top of
   // it turned out to read as an unwanted extra rule, not separation.

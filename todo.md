@@ -27,11 +27,11 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] "Why we ask this" hints so the AI-personalization value is visible
 
 ## Home / trips
-- [ ] Trips list: upcoming, in progress, past, drafts
-- [ ] Trip card: cover, dates, distance, budget, status
-- [ ] Empty state → "generate my first trip" CTA
-- [ ] Pull to refresh, pagination
-- [ ] Quick actions: duplicate, archive, delete, share
+- [x] Trips list: upcoming, in progress, past, drafts
+- [x] Trip card: cover, dates, distance, budget, status
+- [x] Empty state → "generate my first trip" CTA
+- [x] Pull to refresh, pagination
+- [x] Quick actions: duplicate, archive, delete, share
 
 ## Traveler profile
 - [ ] Multi-step wizard, resumable draft

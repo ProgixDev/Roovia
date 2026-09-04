@@ -4,8 +4,8 @@ import { ReactNode } from "react";
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { typography } from "../../../constants/typography";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { typography } from "../../constants/typography";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface AuthLayoutProps {
   title: string;
