@@ -1,38 +1,34 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
-import { Alert, Pressable, SectionList, Share, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ActionSheet, type ActionSheetAction } from "../../components/ui/ActionSheet";
-import { Button } from "../../components/ui/Button";
-import { radius } from "../../constants/themes";
+import { Chip } from "../../components/ui/Chip";
+import { tabBarReservedSpace } from "../../constants/layout";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useAuthStore } from "../../store/authStore";
 import { type Trip, type TripStatus, useTripsStore } from "../../store/tripsStore";
-import { TripCard } from "./TripCard";
+import { TripCompactCard } from "./TripCompactCard";
+import { TripHeroCard } from "./TripHeroCard";
+import { TripSummaryRow } from "./TripSummaryRow";
 
-interface Section {
-  title: string;
-  status: TripStatus;
-  data: Trip[];
-}
+type Filter = "all" | TripStatus;
 
-// Most-relevant-first, not alphabetical or creation order: what's happening
-// right now matters more than a draft that isn't going anywhere yet.
-const SECTION_ORDER: { status: TripStatus; title: string }[] = [
-  { status: "in_progress", title: "En cours" },
-  { status: "upcoming", title: "À venir" },
-  { status: "draft", title: "Brouillons" },
-  { status: "past", title: "Terminés" },
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: "all", label: "Tous" },
+  { value: "in_progress", label: "En cours" },
+  { value: "upcoming", label: "À venir" },
+  { value: "past", label: "Terminés" },
+  { value: "draft", label: "Brouillons" },
 ];
 
-function notReady() {
-  Alert.alert("Bientôt disponible", "La génération de voyage par IA arrive bientôt.");
-}
-
 export default function HomeScreen() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
+  const user = useAuthStore((s) => s.user);
   const trips = useTripsStore((s) => s.trips);
   const refreshing = useTripsStore((s) => s.refreshing);
   const refresh = useTripsStore((s) => s.refresh);
@@ -40,28 +36,23 @@ export default function HomeScreen() {
   const archive = useTripsStore((s) => s.archive);
   const remove = useTripsStore((s) => s.remove);
 
+  const [filter, setFilter] = useState<Filter>("all");
   const [menuTripId, setMenuTripId] = useState<string | null>(null);
 
-  const sections: Section[] = useMemo(() => {
-    const visible = trips.filter((t) => !t.archived);
-    return SECTION_ORDER.map(({ status, title }) => ({
-      title,
-      status,
-      data: visible.filter((t) => t.status === status),
-    })).filter((section) => section.data.length > 0);
-  }, [trips]);
+  const visible = trips.filter((t) => !t.archived);
+  const byStatus = (status: TripStatus) => visible.filter((t) => t.status === status);
+  const inProgress = byStatus("in_progress");
+  const upcoming = byStatus("upcoming");
+  const past = byStatus("past");
+  const drafts = byStatus("draft");
+  const isEmpty = visible.length === 0;
 
   const menuTrip = trips.find((t) => t.id === menuTripId) ?? null;
 
-  const shareTrip = async (trip: Trip) => {
-    try {
-      await Share.share({
-        message: `${trip.title} — ${trip.destination}${trip.dateRange ? ` (${trip.dateRange})` : ""}, sur Roovia.`,
-      });
-    } catch {
-      // The share sheet can be dismissed or fail silently on some
-      // platforms — nothing to recover, there's no state change to undo.
-    }
+  const shareTrip = (trip: Trip) => {
+    Share.share({
+      message: `${trip.title} — ${trip.destination}${trip.dateRange ? ` (${trip.dateRange})` : ""}, sur Roovia.`,
+    }).catch(() => {});
   };
 
   const confirmDelete = (trip: Trip) => {
@@ -84,63 +75,130 @@ export default function HomeScreen() {
     },
   ];
 
+  const showAll = filter === "all";
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.ground }}>
-      <SectionList
-        sections={sections}
-        keyExtractor={(trip) => trip.id}
-        stickySectionHeadersEnabled={false}
-        refreshing={refreshing}
-        onRefresh={refresh}
-        contentContainerStyle={[
-          styles.list,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 },
-        ]}
-        ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={[typography.sectionHead, { color: theme.colors.ink }]}>Mes voyages</Text>
-            <Pressable
-              onPress={notReady}
-              hitSlop={10}
-              style={[styles.addButton, { backgroundColor: theme.colors.blaze }]}
-              accessibilityLabel="Nouveau voyage"
-            >
-              <Ionicons name="add" size={22} color={theme.colors.blazeInk} />
-            </Pressable>
-          </View>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={theme.colors.blaze} />
         }
-        renderSectionHeader={({ section }) => (
-          <Text style={[typography.caption, styles.sectionHeader, { color: theme.colors.inkMuted }]}>
-            {section.title}
-          </Text>
-        )}
-        renderItem={({ item }) => (
-          <View style={styles.cardWrap}>
-            <TripCard trip={item} onPressMore={() => setMenuTripId(item.id)} />
+        contentContainerStyle={[
+          styles.scroll,
+          // Not `insets.top` — the root layout's own SafeAreaView already
+          // reserves it for every non-full-bleed route, this tab included.
+          // Bottom clears the floating tab bar, with real breathing room on
+          // top of that, or the last card reads as crowded against it even
+          // once it's no longer strictly hidden behind it.
+          { paddingTop: 16, paddingBottom: tabBarReservedSpace(insets.bottom) + 48 },
+        ]}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Image source={theme.logo} style={styles.logo} resizeMode="contain" />
+            <Text style={[typography.sectionHead, styles.pageTitle, { color: theme.colors.ink }]}>Mes voyages</Text>
           </View>
-        )}
-        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-        SectionSeparatorComponent={() => <View style={{ height: 28 }} />}
-        ListEmptyComponent={
+          <Pressable
+            onPress={() => router.push("/account" as any)}
+            accessibilityLabel="Mon compte"
+            style={[styles.avatar, { backgroundColor: theme.colors.blaze }]}
+          >
+            <Image
+              source={{ uri: user?.avatarUri ?? "https://i.pravatar.cc/150?img=12" }}
+              style={styles.avatarPhoto}
+            />
+          </Pressable>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filters}>
+          <View style={styles.filterRow}>
+            {FILTERS.map((f) => (
+              <Chip
+                key={f.value}
+                label={f.label}
+                tone="ink"
+                selected={filter === f.value}
+                onPress={() => setFilter(f.value)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+
+        {isEmpty ? (
           <View style={styles.empty}>
-            <Ionicons name="map-outline" size={40} color={theme.colors.inkMuted} />
-            <Text style={[typography.cardTitle, { color: theme.colors.ink, marginTop: 16 }]}>
+            <Text style={[typography.cardTitle, { color: theme.colors.ink }]}>
               {"Aucun voyage pour l'instant"}
             </Text>
-            <Text
-              style={[
-                typography.body,
-                { color: theme.colors.inkMuted, textAlign: "center", marginTop: 6 },
-              ]}
-            >
+            <Text style={[typography.body, { color: theme.colors.inkMuted, textAlign: "center", marginTop: 6 }]}>
               {"Décrivez le voyage dont vous rêvez, l'IA s'occupe du reste."}
             </Text>
-            <View style={{ marginTop: 24, alignSelf: "stretch" }}>
-              <Button label="Générer mon premier voyage" onPress={notReady} />
-            </View>
           </View>
-        }
-      />
+        ) : (
+          <>
+            {(showAll || filter === "in_progress") && inProgress.length > 0 && (
+              <View style={styles.section}>
+                <Text style={[typography.sectionHead, styles.sectionTitle, { color: theme.colors.ink }]}>
+                  En cours
+                </Text>
+                <View style={styles.cardStack}>
+                  {inProgress.map((trip) => (
+                    <TripHeroCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {(showAll || filter === "upcoming") && upcoming.length > 0 && (
+              <View style={styles.section}>
+                <Text style={[typography.sectionHead, styles.sectionTitle, { color: theme.colors.ink }]}>
+                  À venir
+                </Text>
+                <View style={styles.cardStack}>
+                  {upcoming.map((trip) => (
+                    <TripCompactCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {(showAll || filter === "past") &&
+              (showAll ? (
+                past.length > 0 && (
+                  <TripSummaryRow
+                    label="Voyages passés"
+                    count={past.length}
+                    icon="time-outline"
+                    onPress={() => setFilter("past")}
+                  />
+                )
+              ) : (
+                <View style={styles.cardStack}>
+                  {past.map((trip) => (
+                    <TripCompactCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                  ))}
+                </View>
+              ))}
+
+            {(showAll || filter === "draft") &&
+              (showAll ? (
+                drafts.length > 0 && (
+                  <TripSummaryRow
+                    label="Brouillons"
+                    count={drafts.length}
+                    icon="pencil-outline"
+                    onPress={() => setFilter("draft")}
+                  />
+                )
+              ) : (
+                <View style={styles.cardStack}>
+                  {drafts.map((trip) => (
+                    <TripCompactCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                  ))}
+                </View>
+              ))}
+          </>
+        )}
+      </ScrollView>
 
       <ActionSheet
         visible={menuTrip !== null}
@@ -153,27 +211,24 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: { paddingHorizontal: 20, flexGrow: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  addButton: {
+  scroll: { paddingHorizontal: 20, gap: 24 },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+  logo: { width: 34, height: 34 },
+  avatar: {
     width: 40,
     height: 40,
-    borderRadius: radius.pill,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
-  sectionHeader: { marginBottom: 12 },
-  cardWrap: {},
-  empty: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 60,
-    paddingHorizontal: 20,
-  },
+  avatarPhoto: { width: "100%", height: "100%" },
+  filters: { flexGrow: 0 },
+  filterRow: { flexDirection: "row", gap: 10, paddingRight: 20 },
+  pageTitle: { fontSize: 32, lineHeight: 34 },
+  section: { gap: 14 },
+  sectionTitle: { fontSize: 28, lineHeight: 29 },
+  cardStack: { gap: 14 },
+  empty: { alignItems: "center", paddingTop: 60, paddingHorizontal: 10 },
 });

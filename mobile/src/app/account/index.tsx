@@ -9,14 +9,8 @@ import { TextField } from "../../components/ui/TextField";
 import { fonts } from "../../constants/fonts";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { initialsFrom } from "../../lib/initials";
 import { useAuthStore } from "../../store/authStore";
-
-function initialsFrom(name: string | undefined, email: string): string {
-  const source = name?.trim() || email;
-  const parts = source.split(/[\s@.]+/).filter(Boolean);
-  const letters = parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "");
-  return letters.join("") || "?";
-}
 
 export default function AccountScreen() {
   const router = useRouter();

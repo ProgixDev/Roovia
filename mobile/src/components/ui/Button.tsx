@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import {
   ActivityIndicator,
   GestureResponderEvent,
@@ -5,6 +6,7 @@ import {
   PressableProps,
   StyleSheet,
   Text,
+  View,
 } from "react-native";
 
 import { radius } from "../../constants/themes";
@@ -15,6 +17,8 @@ export interface ButtonProps extends Omit<PressableProps, "style" | "onPress"> {
   label: string;
   variant?: "primary" | "secondary";
   loading?: boolean;
+  /** Leading icon — e.g. the "+" on a create action. Hidden while loading. */
+  icon?: keyof typeof Ionicons.glyphMap;
   onPress?: (event: GestureResponderEvent) => void;
 }
 
@@ -28,6 +32,7 @@ export function Button({
   label,
   variant = "primary",
   loading = false,
+  icon,
   disabled,
   onPress,
   ...props
@@ -63,7 +68,10 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <Text style={[typography.button, { color: textColor }]}>{label}</Text>
+        <View style={styles.content}>
+          {icon ? <Ionicons name={icon} size={18} color={textColor} /> : null}
+          <Text style={[typography.button, { color: textColor }]}>{label}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -77,4 +85,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 20,
   },
+  content: { flexDirection: "row", alignItems: "center", gap: 8 },
 });

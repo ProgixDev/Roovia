@@ -387,7 +387,11 @@ function ExpandableTabBar({
               borderRadius: FAB_SIZE / 2,
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: barColor,
+              // `blaze`, not `barColor` — this is the future "new trip"
+              // action (currently still just the overflow grid, same
+              // behavior as before), so it gets the brand accent instead
+              // of blending into the bar like an ordinary tab.
+              backgroundColor: theme.colors.blaze,
               opacity: pressed ? 0.85 : 1,
             },
             SHADOW,
@@ -395,7 +399,7 @@ function ExpandableTabBar({
         >
           {/* The `×` is this same glyph at 45° — see the class doc. */}
           <Animated.View style={fabIconStyle}>
-            <Add size={26} color={theme.foreground.white} variant="Linear" />
+            <Add size={26} color={theme.colors.blazeInk} variant="Linear" />
           </Animated.View>
         </Pressable>
       </View>
