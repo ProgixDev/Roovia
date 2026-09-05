@@ -8,7 +8,7 @@ import { Skeleton } from "../../components/ui/Skeleton";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
-import { GENERATION_STEPS, useGenerationStore } from "../../store/generationStore";
+import { useGenerationStore } from "../../store/generationStore";
 
 /**
  * Simulated streaming — no real job to poll, but the same states a real one
@@ -20,6 +20,7 @@ export default function RunningScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const status = useGenerationStore((s) => s.status);
+  const steps = useGenerationStore((s) => s.steps);
   const stepIndex = useGenerationStore((s) => s.stepIndex);
   const resultTripId = useGenerationStore((s) => s.resultTripId);
   const forceFail = useGenerationStore((s) => s.forceFail);
@@ -61,8 +62,14 @@ export default function RunningScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.ground, paddingTop: 16 }}>
       <Pressable onLongPress={toggleForceFail} style={styles.headerWrap}>
-        <Text style={[typography.sectionHead, { color: theme.colors.ink }]}>
-          Création de votre voyage
+        <View style={styles.headerRow}>
+          <Ionicons name="sparkles" size={18} color={theme.colors.blaze} />
+          <Text style={[typography.sectionHead, { color: theme.colors.ink }]}>
+            L&apos;IA construit votre voyage
+          </Text>
+        </View>
+        <Text style={[typography.caption, { color: theme.colors.inkMuted, marginTop: 6 }]}>
+          {status === "done" ? "Terminé" : `${Math.round((stepIndex / steps.length) * 100)}% terminé`}
         </Text>
         {forceFail ? (
           <Text style={[typography.caption, { color: theme.colors.danger, marginTop: 4 }]}>
@@ -72,7 +79,7 @@ export default function RunningScreen() {
       </Pressable>
 
       <View style={styles.steps}>
-        {GENERATION_STEPS.map((step, i) => {
+        {steps.map((step, i) => {
           const done = i < stepIndex || status === "done";
           const active = i === stepIndex && status === "pending";
           return (
@@ -85,16 +92,25 @@ export default function RunningScreen() {
                   },
                 ]}
               >
-                {done ? <Ionicons name="checkmark" size={14} color="#FFFFFF" /> : null}
+                {done ? <Ionicons name="checkmark" size={14} color="#FFFFFF" /> : active ? (
+                  <View style={styles.stepPulse} />
+                ) : null}
               </View>
-              <Text
-                style={[
-                  typography.body,
-                  { color: done || active ? theme.colors.ink : theme.colors.inkMuted },
-                ]}
-              >
-                {step.label}
-              </Text>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={[
+                    typography.body,
+                    { color: done || active ? theme.colors.ink : theme.colors.inkMuted },
+                  ]}
+                >
+                  {step.label}
+                </Text>
+                {active ? (
+                  <Text style={[typography.caption, { color: theme.colors.inkMuted, textTransform: "none", letterSpacing: 0, marginTop: 2 }]}>
+                    {step.detail}
+                  </Text>
+                ) : null}
+              </View>
             </View>
           );
         })}
@@ -116,9 +132,11 @@ export default function RunningScreen() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 },
   headerWrap: { paddingHorizontal: 20 },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   steps: { paddingHorizontal: 20, marginTop: 28, gap: 18 },
-  stepRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  stepRow: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
   stepDot: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  stepPulse: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FFFFFF" },
   skeletons: { paddingHorizontal: 20, marginTop: 32, gap: 12 },
   footer: { paddingHorizontal: 20, marginTop: "auto", marginBottom: 32 },
 });

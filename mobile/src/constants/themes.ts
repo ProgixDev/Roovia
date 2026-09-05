@@ -1,8 +1,8 @@
 export interface Theme {
-  // Legacy 3-field shape — kept because the demo screens (TabDesign1-9,
-  // Skeleton, ThemeVariantPreview...) already consume it and are already
-  // correctly Roovia-colored. New screens should prefer `colors` below,
-  // which carries the full DESIGN.md token set.
+  // Legacy 3-field shape — kept because the demo screens (Skeleton,
+  // ThemeVariantPreview...) already consume it and are already correctly
+  // Roovia-colored. New screens should prefer `colors` below, which
+  // carries the full DESIGN.md token set.
   primary: {
     main: string;
     light: string;
@@ -64,8 +64,8 @@ export interface ThemeVariant {
 // A topo-map register: paper/ink neutrals, trail-blaze orange as the one
 // saturated accent. `background.dark/darker/accent` follow the codebase's
 // existing elevation convention (dark = page, darker = card/bar fill,
-// accent = border & skeleton contrast — see TabDesign5/8/9 and Skeleton.tsx),
-// mapped onto DESIGN.md's ground/surface/line tokens.
+// accent = border & skeleton contrast — see Skeleton.tsx), mapped onto
+// DESIGN.md's ground/surface/line tokens.
 const defaultVariant: ThemeVariant = {
   id: "default",
   name: "Roovia",

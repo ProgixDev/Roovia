@@ -1,20 +1,20 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { type Icon as IconsaxIcon } from "iconsax-react-native";
+import { Add, type Icon as IconsaxIcon } from "iconsax-react-native";
 import { Platform, Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { typography } from "../../constants/typography";
-import { radius } from "../../constants/themes";
 import { useTheme } from "../../contexts/ThemeContext";
 
 /**
- * Real navigation, extracted out of `components/screens/tabs/TabDesign9`
- * (template scaffolding — see `.agents/AGENTS.md`) and simplified: that
- * design's `+` opened an overflow grid of not-yet-built destinations. This
- * app's `+` is a real action — AI trip generation — so there is no grid to
- * open, just a `onPressFab` callback the route layout wires to `/generate`.
+ * A floating pill of tabs beside a separate circular `+` button — the
+ * layout from the old TabDesign9 template, minus the part that made it a
+ * template: pressing `+` there grew the pill into an overflow grid of
+ * destinations that didn't fit. This app only ever has the 4 approved tabs
+ * (see `(tabs)/_layout.tsx`) and one real action behind `+` — AI trip
+ * generation — so there is nothing to expand into. `+` just calls
+ * `onPressFab` directly.
  */
 export interface TabConfig {
   /** Route file name inside `app/(tabs)`, without the extension. */
@@ -25,9 +25,12 @@ export interface TabConfig {
 }
 
 const BAR_HEIGHT = 64;
-const FAB_SIZE = 48;
+const FAB_SIZE = BAR_HEIGHT;
+const PANEL_RADIUS = BAR_HEIGHT / 2;
+const FAB_GAP = 12;
 const ICON_SIZE = 22;
 const LABEL_FONT_SIZE = 11;
+const LABEL_GAP = 4;
 const GUTTER = 16;
 const MIN_BOTTOM_GAP = 12;
 
@@ -53,54 +56,6 @@ function Bar({ state, navigation, tabs, onPressFab }: BottomTabBarProps & { tabs
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
-  // Exactly 4 destinations either side of the center action, per the
-  // approved IA (Voyages · Carte · [+] · Communauté · Profil) — not a
-  // generic "N tabs + fab in the middle" layout, because the app isn't
-  // going to grow past 4 without a design revisit anyway.
-  const left = tabs.slice(0, 2);
-  const right = tabs.slice(2, 4);
-
-  const renderTab = (tab: TabConfig) => {
-    const index = state.routes.findIndex((r) => r.name === tab.name);
-    if (index === -1) return null;
-    const route = state.routes[index];
-    const focused = state.index === index;
-    const badge = tab.badge ?? 0;
-    const Icon = tab.icon;
-    const tint = focused ? theme.colors.blaze : theme.colors.inkMuted;
-
-    return (
-      <Pressable
-        key={route.key}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: focused }}
-        accessibilityLabel={badge > 0 ? `${tab.title}, ${badge}` : tab.title}
-        onPress={() => {
-          const event = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
-          if (!focused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        }}
-        style={({ pressed }) => ({ flex: 1, alignItems: "center", opacity: pressed ? 0.6 : 1 })}
-      >
-        <View>
-          <Icon size={ICON_SIZE} color={tint} variant={focused ? "Bold" : "Linear"} />
-          {badge > 0 ? (
-            <View
-              style={[
-                styles.badge,
-                { backgroundColor: BADGE_COLOR, borderColor: theme.colors.surface },
-              ]}
-            />
-          ) : null}
-        </View>
-        <Text numberOfLines={1} style={[typography.caption, styles.label, { color: tint }]}>
-          {tab.title}
-        </Text>
-      </Pressable>
-    );
-  };
-
   return (
     <View
       style={[
@@ -109,47 +64,75 @@ function Bar({ state, navigation, tabs, onPressFab }: BottomTabBarProps & { tabs
       ]}
       pointerEvents="box-none"
     >
-      <View style={[styles.bar, { backgroundColor: theme.colors.surface }, SHADOW]}>
-        {left.map(renderTab)}
+      <View style={[styles.pill, { backgroundColor: theme.colors.surface }, SHADOW]}>
+        {state.routes.map((route, index) => {
+          const tab = tabs.find((t) => t.name === route.name);
+          if (!tab) return null;
 
-        <View style={styles.fabSlot}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Générer un voyage"
-            onPress={onPressFab}
-            style={({ pressed }) => [
-              styles.fab,
-              { backgroundColor: theme.colors.blaze, opacity: pressed ? 0.85 : 1 },
-            ]}
-          >
-            <Ionicons name="add" size={26} color={theme.colors.blazeInk} />
-          </Pressable>
-        </View>
+          const focused = state.index === index;
+          const badge = tab.badge ?? 0;
+          const Icon = tab.icon;
+          const tint = focused ? theme.colors.blaze : theme.colors.inkMuted;
 
-        {right.map(renderTab)}
+          return (
+            <Pressable
+              key={route.key}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: focused }}
+              accessibilityLabel={badge > 0 ? `${tab.title}, ${badge}` : tab.title}
+              onPress={() => {
+                const event = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
+                if (!focused && !event.defaultPrevented) {
+                  navigation.navigate(route.name);
+                }
+              }}
+              style={({ pressed }) => ({ paddingHorizontal: 12, alignItems: "center", opacity: pressed ? 0.6 : 1 })}
+            >
+              <View>
+                <Icon size={ICON_SIZE} color={tint} variant={focused ? "Bold" : "Linear"} />
+                {badge > 0 ? (
+                  <View style={[styles.badge, { backgroundColor: BADGE_COLOR, borderColor: theme.colors.surface }]} />
+                ) : null}
+              </View>
+              <Text numberOfLines={1} style={[typography.caption, styles.label, { color: tint }]}>
+                {tab.title}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Générer un voyage"
+        onPress={onPressFab}
+        style={({ pressed }) => [styles.fab, { backgroundColor: theme.colors.blaze, opacity: pressed ? 0.85 : 1 }, SHADOW]}
+      >
+        <Add size={26} color={theme.colors.blazeInk} variant="Linear" />
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: "absolute", left: 0, right: 0, bottom: 0 },
-  bar: {
+  wrap: { position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row", alignItems: "flex-end" },
+  pill: {
+    flex: 1,
     height: BAR_HEIGHT,
-    borderRadius: radius.pill,
+    borderRadius: PANEL_RADIUS,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 8,
+    justifyContent: "space-evenly",
   },
-  fabSlot: { width: FAB_SIZE + 16, alignItems: "center", justifyContent: "center" },
   fab: {
+    marginLeft: FAB_GAP,
     width: FAB_SIZE,
     height: FAB_SIZE,
     borderRadius: FAB_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  label: { marginTop: 3, textTransform: "none", letterSpacing: 0, fontSize: LABEL_FONT_SIZE },
+  label: { marginTop: LABEL_GAP, textTransform: "none", letterSpacing: 0, fontSize: LABEL_FONT_SIZE },
   badge: {
     position: "absolute",
     top: -2,

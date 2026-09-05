@@ -1,7 +1,8 @@
 import { create } from "zustand";
 
-import type { GeneratedItinerary, Stop, TripDay } from "../mocks/itineraries";
+import { buildMockItinerary, type GeneratedItinerary, type Stop, type TripDay } from "../mocks/itineraries";
 import type { Suggestion } from "../mocks/suggestions";
+import { SEED_TRIPS } from "./tripsStore";
 
 export interface ItineraryVersion {
   id: string;
@@ -61,8 +62,41 @@ function withActiveDays(
   return { ...itinerary, versions };
 }
 
+/**
+ * Every non-draft seed trip gets a fabricated itinerary up front — see
+ * `buildMockItinerary`'s doc — so opening one of Home's pre-existing trips
+ * (none of which ever went through `/generate`) shows a real day-by-day
+ * plan instead of the "not generated yet" empty state. Drafts keep that
+ * empty state on purpose: it's the one place the app still shows what a
+ * trip looks like before the AI has run.
+ */
+function seedItineraries(): Record<string, Itinerary> {
+  const result: Record<string, Itinerary> = {};
+  for (const trip of SEED_TRIPS) {
+    if (trip.status === "draft" || trip.distanceKm === null || trip.budgetEur === null) continue;
+    const dayCount = trip.dayProgress?.total ?? Math.max(3, Math.min(7, Math.round(trip.distanceKm / 150)));
+    const result_ = buildMockItinerary({
+      title: trip.title,
+      destination: trip.destination,
+      totalDistanceKm: trip.distanceKm,
+      totalBudgetEur: trip.budgetEur,
+      dayCount,
+    });
+    const version = toVersion(result_, "Généré par l'IA");
+    result[trip.id] = {
+      tripId: trip.id,
+      destination: result_.destination,
+      versions: [version],
+      activeVersionId: version.id,
+      lockedStopIds: [],
+      favoriteStopIds: [],
+    };
+  }
+  return result;
+}
+
 export const useItineraryStore = create<ItineraryState>((set, get) => ({
-  itineraries: {},
+  itineraries: seedItineraries(),
 
   createFromResult(tripId, result) {
     const version = toVersion(result, "Version initiale");

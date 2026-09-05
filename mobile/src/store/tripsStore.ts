@@ -21,6 +21,8 @@ export interface Trip {
   /** "Day 8 of 19" — only meaningful mid-trip. Stored, not computed from
    * `dateRange`, same reasoning as `dateRange` itself: static seed content. */
   dayProgress: { current: number; total: number } | null;
+  /** Every trip in this app is presented as AI-built — seed trips included, per product direction: the demo should read as "the AI already generated these" rather than distinguishing mock from generated. Drives the "Généré par l'IA" badge/banner. */
+  aiGenerated: boolean;
 }
 
 function unsplash(photoId: string): ImageSourcePropType {
@@ -38,7 +40,8 @@ const FILLER_COVERS = [
   unsplash("photo-1676634277252-047112f14b60"), // tea + map
 ];
 
-const SEED_TRIPS: Trip[] = [
+/** Exported so `itineraryStore` can seed matching itineraries for these trips at module load — see its `INITIAL_ITINERARIES`. */
+export const SEED_TRIPS: Trip[] = [
   // The two trips with real supplied cover art — exact mock data as given
   // (title, dates, distance, budget, day-progress).
   {
@@ -51,6 +54,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 1580,
     status: "in_progress",
     archived: false,
+    aiGenerated: true,
     dayProgress: { current: 6, total: 11 },
   },
   {
@@ -63,6 +67,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 740,
     status: "upcoming",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
 
@@ -78,6 +83,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 610,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -90,6 +96,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 780,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -102,6 +109,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 420,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -114,6 +122,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 890,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -126,6 +135,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 520,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -138,6 +148,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 1120,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -150,6 +161,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: 1490,
     status: "past",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
 
@@ -164,6 +176,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: null,
     status: "draft",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -176,6 +189,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: null,
     status: "draft",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
   {
@@ -188,6 +202,7 @@ const SEED_TRIPS: Trip[] = [
     budgetEur: null,
     status: "draft",
     archived: false,
+    aiGenerated: true,
     dayProgress: null,
   },
 ];
@@ -253,6 +268,7 @@ export const useTripsStore = create<TripsState>((set, get) => ({
       budgetEur: input.budgetEur,
       status: "upcoming",
       archived: false,
+      aiGenerated: true,
       dayProgress: null,
     };
     set({ trips: [trip, ...get().trips] });

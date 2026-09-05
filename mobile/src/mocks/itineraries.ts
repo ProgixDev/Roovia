@@ -226,3 +226,104 @@ export function pickBaseItinerary(promptOrDestination: string): GeneratedItinera
   }
   return BASE_ITINERARIES[1];
 }
+
+/** Roughly where a named destination sits, for a mock itinerary's route to at least land on the right part of the map. */
+const DESTINATION_CENTROIDS: { match: string; lat: number; lng: number }[] = [
+  { match: "atlantique", lat: 45.9, lng: -1.2 },
+  { match: "étretat", lat: 49.7, lng: 0.2 },
+  { match: "normandie", lat: 49.4, lng: 0.6 },
+  { match: "verdon", lat: 43.75, lng: 6.33 },
+  { match: "dordogne", lat: 44.95, lng: 1.0 },
+  { match: "pyrénées", lat: 42.75, lng: 0.6 },
+  { match: "basque", lat: 43.3, lng: -1.6 },
+  { match: "alpes", lat: 45.2, lng: 6.6 },
+  { match: "toscane", lat: 43.3, lng: 11.1 },
+  { match: "andalousie", lat: 37.2, lng: -4.9 },
+  { match: "écosse", lat: 56.6, lng: -4.2 },
+  { match: "islande", lat: 64.9, lng: -18.5 },
+  { match: "norvège", lat: 61.5, lng: 7.5 },
+  { match: "espagne", lat: 42.5, lng: -3.5 },
+  { match: "portugal", lat: 39.5, lng: -8.5 },
+];
+const DEFAULT_CENTROID = { lat: 46.6, lng: 2.5 };
+
+function centroidFor(destination: string): { lat: number; lng: number } {
+  const q = destination.toLowerCase();
+  const hit = DESTINATION_CENTROIDS.find((c) => q.includes(c.match));
+  return hit ? { lat: hit.lat, lng: hit.lng } : DEFAULT_CENTROID;
+}
+
+const DAY_VISIT_TEMPLATES = [
+  (d: string) => `Découverte de ${d}`,
+  (d: string) => `Balade autour de ${d}`,
+  (d: string) => `Point de vue sur ${d}`,
+  (d: string) => `Marché local — ${d}`,
+  (d: string) => `Randonnée près de ${d}`,
+  (d: string) => `Village typique — ${d}`,
+];
+
+const OVERNIGHT_TEMPLATES: { name: string; kind: "sleep_paid" | "sleep_free"; priceEur: number | null }[] = [
+  { name: "Aire de camping-car", kind: "sleep_paid", priceEur: 14 },
+  { name: "Bivouac nature", kind: "sleep_free", priceEur: null },
+  { name: "Camping municipal", kind: "sleep_paid", priceEur: 19 },
+];
+
+/**
+ * Stands in for a real generation call: given only what a trip card already
+ * shows (destination, distance, budget, a day count), it fabricates a
+ * plausible day-by-day itinerary — real `GeneratedItinerary` shape, so
+ * every downstream feature (budget, checklist, journal, suggestions,
+ * map) treats it exactly like an itinerary a real model produced. Used to
+ * seed the trips that exist before the user has ever generated anything
+ * (see `tripsStore`'s `SEED_TRIPS`), so opening one doesn't hit an empty
+ * "not generated yet" state.
+ */
+export function buildMockItinerary(params: {
+  title: string;
+  destination: string;
+  totalDistanceKm: number;
+  totalBudgetEur: number;
+  dayCount: number;
+}): GeneratedItinerary {
+  const { title, destination, totalDistanceKm, totalBudgetEur } = params;
+  const dayCount = Math.max(2, Math.min(params.dayCount, 8));
+  const centroid = centroidFor(destination);
+  const days: TripDay[] = [];
+
+  for (let i = 0; i < dayCount; i++) {
+    const angle = i * 0.9;
+    const lat = centroid.lat + Math.sin(angle) * 0.18 + i * 0.03;
+    const lng = centroid.lng + Math.cos(angle) * 0.22 + i * 0.04;
+    const isLastDay = i === dayCount - 1;
+
+    const stops: Stop[] = [
+      {
+        id: nextId("stop"),
+        name: DAY_VISIT_TEMPLATES[i % DAY_VISIT_TEMPLATES.length](destination),
+        kind: i % 3 === 2 ? "activity" : "visit",
+        description: "Étape sélectionnée par l'IA à partir de votre profil et de votre itinéraire.",
+        coordinate: { latitude: lat, longitude: lng },
+        driveTimeMinFromPrev: i === 0 ? null : 45 + (i % 3) * 20,
+        priceEur: i % 4 === 0 ? 8 : null,
+      },
+    ];
+
+    if (!isLastDay) {
+      const overnight = OVERNIGHT_TEMPLATES[i % OVERNIGHT_TEMPLATES.length];
+      stops.push({
+        id: nextId("stop"),
+        name: overnight.name,
+        kind: overnight.kind,
+        description: "Étape pour la nuit, proposée par l'IA d'après des avis récents.",
+        coordinate: { latitude: lat + 0.02, longitude: lng + 0.02 },
+        driveTimeMinFromPrev: 15,
+        priceEur: overnight.priceEur,
+        ratingOutOf5: overnight.kind === "sleep_paid" ? Math.round((4.1 + (i % 3) * 0.2) * 10) / 10 : undefined,
+      });
+    }
+
+    days.push({ id: nextId("day"), index: i + 1, stops });
+  }
+
+  return { title, destination, days, totalDistanceKm, totalBudgetEur };
+}
