@@ -40,21 +40,30 @@ export const TAB_BAR_CLEARANCE = BAR_HEIGHT + 24;
 const BADGE_COLOR = "#e5484d";
 const BADGE_SIZE = 9;
 
-const SHADOW: ViewStyle =
-  Platform.select<ViewStyle>({
-    ios: {
-      shadowColor: "#000000",
-      shadowOpacity: 0.15,
-      shadowRadius: 16,
-      shadowOffset: { width: 0, height: 6 },
-    },
-    android: { elevation: 8, shadowColor: "#000000" },
-    default: {},
-  }) ?? {};
-
 function Bar({ state, navigation, tabs, onPressFab }: BottomTabBarProps & { tabs: TabConfig[]; onPressFab: () => void }) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+
+  // Not `theme.shadow` as-is: that token is calibrated for a surface sitting
+  // on a backdrop (a modal, a sheet), and dark mode's version of it
+  // (0.45 opacity, elevation 8) is tuned for that separation. A floating
+  // pill sitting directly on the plain dark background instead turns that
+  // same black-at-45%-opacity into a hard, high-contrast blob rather than a
+  // soft shadow — dark-on-near-black reads very differently than dark-on-
+  // light does. Light mode's own token already looks right here (kept
+  // as-is); dark mode gets its own much lower intensity instead of
+  // borrowing the shared one verbatim.
+  const shadow: ViewStyle =
+    Platform.select<ViewStyle>({
+      ios: {
+        shadowColor: theme.shadow.color,
+        shadowOpacity: isDark ? 0.25 : theme.shadow.opacity,
+        shadowRadius: isDark ? 10 : theme.shadow.radius,
+        shadowOffset: isDark ? { width: 0, height: 4 } : theme.shadow.offset,
+      },
+      android: { elevation: isDark ? 4 : theme.shadow.elevation, shadowColor: theme.shadow.color },
+      default: {},
+    }) ?? {};
 
   return (
     <View
@@ -64,7 +73,7 @@ function Bar({ state, navigation, tabs, onPressFab }: BottomTabBarProps & { tabs
       ]}
       pointerEvents="box-none"
     >
-      <View style={[styles.pill, { backgroundColor: theme.colors.surface }, SHADOW]}>
+      <View style={[styles.pill, { backgroundColor: theme.colors.surface }, shadow]}>
         {state.routes.map((route, index) => {
           const tab = tabs.find((t) => t.name === route.name);
           if (!tab) return null;
@@ -106,7 +115,7 @@ function Bar({ state, navigation, tabs, onPressFab }: BottomTabBarProps & { tabs
         accessibilityRole="button"
         accessibilityLabel="Générer un voyage"
         onPress={onPressFab}
-        style={({ pressed }) => [styles.fab, { backgroundColor: theme.colors.blaze, opacity: pressed ? 0.85 : 1 }, SHADOW]}
+        style={({ pressed }) => [styles.fab, { backgroundColor: theme.colors.blaze, opacity: pressed ? 0.85 : 1 }, shadow]}
       >
         <Add size={26} color={theme.colors.blazeInk} variant="Linear" />
       </Pressable>

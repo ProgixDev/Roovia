@@ -98,13 +98,22 @@ export default function ServicesMapScreen() {
       <View style={{ flex: 1 }}>
         <RooviaMap pins={pins} onPressPin={(id) => setSelectedPoi(allPois.find((p) => p.id === id) ?? null)} style={{ flex: 1 }} />
 
-        <Pressable onPress={() => setSubmitOpen(true)} style={[styles.fab, styles.fabSubmit, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
+        <Pressable
+          onPress={() => setSubmitOpen(true)}
+          style={[styles.fab, { top: 16, left: 16, backgroundColor: theme.colors.surface, borderColor: theme.colors.line, borderWidth: 1 }]}
+        >
           <Ionicons name="add-outline" size={22} color={theme.colors.ink} />
         </Pressable>
-        <Pressable onPress={() => setFiltersOpen(true)} style={[styles.fab, styles.fabFilters, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
+        <Pressable
+          onPress={() => setFiltersOpen(true)}
+          style={[styles.fab, { top: 76, left: 16, backgroundColor: theme.colors.surface, borderColor: theme.colors.line, borderWidth: 1 }]}
+        >
           <Ionicons name="options-outline" size={20} color={theme.colors.ink} />
         </Pressable>
-        <Pressable onPress={() => setNearMeOpen(true)} style={[styles.fab, styles.fabNearMe, { backgroundColor: theme.colors.blaze }]}>
+        <Pressable
+          onPress={() => setNearMeOpen(true)}
+          style={[styles.fab, { top: 136, left: 16, backgroundColor: theme.colors.blaze }]}
+        >
           <Ionicons name="locate" size={20} color={theme.colors.blazeInk} />
         </Pressable>
       </View>
@@ -126,7 +135,4 @@ export default function ServicesMapScreen() {
 const styles = StyleSheet.create({
   toolbar: { paddingHorizontal: 20, paddingBottom: 12 },
   fab: { position: "absolute", width: 48, height: 48, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
-  fabSubmit: { right: 16, bottom: 136, borderWidth: 1 },
-  fabFilters: { right: 16, bottom: 76, borderWidth: 1 },
-  fabNearMe: { right: 16, bottom: 16 },
 });

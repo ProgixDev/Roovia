@@ -32,7 +32,7 @@ export function TripHeroCard({ trip, onPress, onPressMore }: TripHeroCardProps) 
     <Pressable
       onPress={onPress}
       style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
-      <View style={styles.coverWrap}>
+      <View style={[styles.coverWrap, { backgroundColor: theme.colors.surface }]}>
         <Image
           source={trip.cover}
           style={[styles.cover, { backgroundColor: theme.colors.surfaceSunken }]}
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
   },
-  coverWrap: { width: "38%", padding: 8, backgroundColor: "#FFFFFF" },
+  coverWrap: { width: "38%", padding: 8 },
   cover: { flex: 1, borderRadius: radius.lg - 8 },
   body: { flex: 1, padding: 16, justifyContent: "center", gap: 4 },
   stats: { flexDirection: "row", alignItems: "center", marginTop: 20 },
