@@ -13,6 +13,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { RooviaMap } from "../map/RooviaMap";
 import { interpolateAlongRoute, scrubCoordinate } from "../map/useMapRegion";
 import type { MapPinData } from "../map/types";
+import { emptyArray } from "../../lib/emptyArray";
 import { PublishSheet } from "../community/PublishSheet";
 import { PaywallSheet } from "../paywall/PaywallSheet";
 import { useAuthStore } from "../../store/authStore";
@@ -75,9 +76,9 @@ export default function TripDetailScreen() {
   const hasSeenPostGenerationUpsell = useEntitlementsStore((s) => s.hasSeenPostGenerationUpsell);
   const markPostGenerationUpsellSeen = useEntitlementsStore((s) => s.markPostGenerationUpsellSeen);
 
-  const suggestions = useSuggestionsStore((s) => s.byTrip[id] ?? []);
-  const dismissedSuggestionIds = useSuggestionsStore((s) => s.dismissedIds[id] ?? []);
-  const appliedSuggestionIds = useSuggestionsStore((s) => s.appliedIds[id] ?? []);
+  const suggestions = useSuggestionsStore((s) => s.byTrip[id] ?? emptyArray());
+  const dismissedSuggestionIds = useSuggestionsStore((s) => s.dismissedIds[id] ?? emptyArray());
+  const appliedSuggestionIds = useSuggestionsStore((s) => s.appliedIds[id] ?? emptyArray());
   const ensureSuggestionsGenerated = useSuggestionsStore((s) => s.ensureGenerated);
   const dismissSuggestion = useSuggestionsStore((s) => s.dismiss);
   const markSuggestionApplied = useSuggestionsStore((s) => s.markApplied);

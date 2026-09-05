@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Share, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../components/ui/Button";
@@ -6,6 +7,7 @@ import { Switch } from "../../components/ui/Switch";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { emptyArray } from "../../lib/emptyArray";
 import { computeRecapStats } from "../../lib/journalStats";
 import type { TripDay } from "../../mocks/itineraries";
 import { useJournalStore } from "../../store/journalStore";
@@ -25,11 +27,21 @@ export function JournalSegment({ tripId, tripTitle, tripStatus, days, totalDista
   const { theme } = useTheme();
   const recording = useJournalStore((s) => s.recordingByTrip[tripId] ?? false);
   const batteryAware = useJournalStore((s) => s.batteryAwareByTrip[tripId] ?? true);
-  const entries = useJournalStore((s) => s.entriesByTrip[tripId] ?? []);
+  const entries = useJournalStore((s) => s.entriesByTrip[tripId] ?? emptyArray());
   const toggleRecording = useJournalStore((s) => s.toggleRecording);
   const toggleBatteryAware = useJournalStore((s) => s.toggleBatteryAware);
   const ensureEntries = useJournalStore((s) => s.ensureEntries);
   const updateCaption = useJournalStore((s) => s.updateCaption);
+
+  // Above the early returns below on purpose — every hook in this
+  // component has to run on every render regardless of trip state, so the
+  // "no days yet" / "already has entries" guards live inside the effect
+  // instead of around the `useEffect` call itself.
+  useEffect(() => {
+    if (!days || days.length === 0 || entries.length > 0) return;
+    ensureEntries(tripId, days);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripId, days]);
 
   if (tripStatus === "draft" || tripStatus === "upcoming") {
     return (
@@ -45,7 +57,6 @@ export function JournalSegment({ tripId, tripTitle, tripStatus, days, totalDista
     return <EmptyState icon="map-outline" title="Aucun itinéraire" body="Ce voyage n'a pas d'itinéraire à partir duquel construire un journal." />;
   }
 
-  if (entries.length === 0) ensureEntries(tripId, days);
   const stopCoordinates = days.flatMap((d) => d.stops.map((s) => s.coordinate));
   const recap = computeRecapStats(stopCoordinates, totalDistanceKm, days.length);
 

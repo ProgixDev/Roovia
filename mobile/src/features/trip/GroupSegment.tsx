@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../components/ui/Button";
@@ -10,6 +10,7 @@ import { TextField } from "../../components/ui/TextField";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { emptyArray } from "../../lib/emptyArray";
 import { interpolateAlongRoute } from "../map/useMapRegion";
 import { RooviaMap } from "../map/RooviaMap";
 import type { LatLng, MemberMarker } from "../map/types";
@@ -32,10 +33,10 @@ const DEMO_PHASES = [0.35, 0.62];
 
 export function GroupSegment({ tripId, tripTitle, meName, routeCoordinates, allStops, onApproveProposal }: GroupSegmentProps) {
   const { theme } = useTheme();
-  const members = useGroupStore((s) => s.membersByTrip[tripId] ?? []);
-  const convoy = useGroupStore((s) => s.convoyByTrip[tripId] ?? []);
-  const proposals = useGroupStore((s) => s.proposalsByTrip[tripId] ?? []);
-  const comments = useGroupStore((s) => s.commentsByTrip[tripId] ?? []);
+  const members = useGroupStore((s) => s.membersByTrip[tripId] ?? emptyArray());
+  const convoy = useGroupStore((s) => s.convoyByTrip[tripId] ?? emptyArray());
+  const proposals = useGroupStore((s) => s.proposalsByTrip[tripId] ?? emptyArray());
+  const comments = useGroupStore((s) => s.commentsByTrip[tripId] ?? emptyArray());
   const conflict = useGroupStore((s) => s.conflictByTrip[tripId] ?? false);
   const ensureOwner = useGroupStore((s) => s.ensureOwner);
   const addMember = useGroupStore((s) => s.addMember);
@@ -56,7 +57,10 @@ export function GroupSegment({ tripId, tripTitle, meName, routeCoordinates, allS
   const [selectedStopId, setSelectedStopId] = useState<string | null>(allStops[0]?.id ?? null);
   const [commentText, setCommentText] = useState("");
 
-  if (members.length === 0) ensureOwner(tripId, meName);
+  useEffect(() => {
+    if (members.length === 0) ensureOwner(tripId, meName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripId]);
   const isOwner = members.find((m) => m.id === "me")?.role === "owner";
 
   const memberMarkers: MemberMarker[] = members

@@ -18,10 +18,14 @@ export default function PublicProfileScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
 
-  const trips = COMMUNITY_TRIPS.filter((t) => t.author.id === id);
-  const author = trips[0]?.author;
+  const myPublished = useCommunityStore((s) => s.myPublished);
   const followedAuthorIds = useCommunityStore((s) => s.followedAuthorIds);
   const toggleFollow = useCommunityStore((s) => s.toggleFollow);
+
+  // Self-published trips (author.id "me", see TripDetailScreen's publish
+  // call) live only in myPublished, not the static community seed set.
+  const trips = [...COMMUNITY_TRIPS, ...myPublished].filter((t) => t.author.id === id);
+  const author = trips[0]?.author;
 
   const goBack = () => {
     if (router.canGoBack()) router.back();

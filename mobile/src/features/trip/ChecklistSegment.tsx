@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../components/ui/Button";
@@ -11,6 +11,7 @@ import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { CATEGORY_LABEL, generateChecklist, type ChecklistCategory } from "../../lib/checklistRules";
+import { emptyArray } from "../../lib/emptyArray";
 import { useChecklistStore } from "../../store/checklistStore";
 import { useExpensesStore } from "../../store/expensesStore";
 import { useTravelerProfileStore } from "../../store/travelerProfileStore";
@@ -30,10 +31,10 @@ export function ChecklistSegment({ tripId, destination, nightsFromItinerary }: C
   const { theme } = useTheme();
   const profile = useTravelerProfileStore((s) => s.profile);
   const activeVehicle = useVehiclesStore((s) => s.vehicles.find((v) => v.id === s.activeId)) ?? null;
-  const participants = useExpensesStore((s) => s.participantsByTrip[tripId] ?? []);
+  const participants = useExpensesStore((s) => s.participantsByTrip[tripId] ?? emptyArray());
   const nights = nightsFromItinerary ?? profile.nights;
 
-  const items = useChecklistStore((s) => s.itemsByTrip[tripId] ?? []);
+  const items = useChecklistStore((s) => s.itemsByTrip[tripId] ?? emptyArray());
   const reminders = useChecklistStore((s) => s.remindersByTrip[tripId]) ?? { d7: true, d1: true };
   const template = useChecklistStore((s) => s.template);
   const ensureGenerated = useChecklistStore((s) => s.ensureGenerated);
@@ -48,12 +49,18 @@ export function ChecklistSegment({ tripId, destination, nightsFromItinerary }: C
   const [newLabel, setNewLabel] = useState("");
   const [newCategory, setNewCategory] = useState<ChecklistCategory>("bagages");
 
-  if (items.length === 0) {
-    ensureGenerated(
-      tripId,
-      generateChecklist({ destination, nights, party: profile.party, hasChildren: profile.children.length > 0, vehicle: activeVehicle }),
-    );
-  }
+  useEffect(() => {
+    if (items.length === 0) {
+      ensureGenerated(
+        tripId,
+        generateChecklist({ destination, nights, party: profile.party, hasChildren: profile.children.length > 0, vehicle: activeVehicle }),
+      );
+    }
+    // Generates once per trip — re-running whenever `items` changes would
+    // fire again after every toggle/add/remove, since an empty list can
+    // legitimately happen mid-session too (e.g. every item removed).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripId]);
 
   const doneCount = items.filter((i) => i.done).length;
   const overallProgress = items.length > 0 ? doneCount / items.length : 0;

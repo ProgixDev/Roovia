@@ -12,6 +12,7 @@ import { TextField } from "../../components/ui/TextField";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { emptyArray } from "../../lib/emptyArray";
 import { useAuthStore } from "../../store/authStore";
 import { COMMUNITY_TRIPS } from "../../mocks/community";
 import type { MapPinData } from "../map/types";
@@ -37,7 +38,7 @@ export default function CommunityDetailScreen() {
   const toggleFollow = useCommunityStore((s) => s.toggleFollow);
   const block = useCommunityStore((s) => s.block);
   const report = useCommunityStore((s) => s.report);
-  const userReviews = useCommunityStore((s) => s.reviewsByTrip[id] ?? []);
+  const userReviews = useCommunityStore((s) => s.reviewsByTrip[id] ?? emptyArray());
   const addReview = useCommunityStore((s) => s.addReview);
   const addGenerated = useTripsStore((s) => s.addGenerated);
   const createFromResult = useItineraryStore((s) => s.createFromResult);

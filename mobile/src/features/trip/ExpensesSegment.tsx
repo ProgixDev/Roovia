@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../components/ui/Button";
@@ -10,6 +10,7 @@ import { TextField } from "../../components/ui/TextField";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { emptyArray } from "../../lib/emptyArray";
 import { formatEurAs } from "../../lib/format";
 import { computeBalances, minimalSettlement, type Expense } from "../../lib/settle";
 import { useExpensesStore } from "../../store/expensesStore";
@@ -28,8 +29,8 @@ export function ExpensesSegment({ tripId, tripTitle, meName }: ExpensesSegmentPr
   const { theme } = useTheme();
   const currency = useSettingsStore((s) => s.currency);
 
-  const participants = useExpensesStore((s) => s.participantsByTrip[tripId] ?? []);
-  const expenses = useExpensesStore((s) => s.expensesByTrip[tripId] ?? []);
+  const participants = useExpensesStore((s) => s.participantsByTrip[tripId] ?? emptyArray());
+  const expenses = useExpensesStore((s) => s.expensesByTrip[tripId] ?? emptyArray());
   const offline = useExpensesStore((s) => s.offline);
   const ensureParticipants = useExpensesStore((s) => s.ensureParticipants);
   const addParticipant = useExpensesStore((s) => s.addParticipant);
@@ -42,7 +43,10 @@ export function ExpensesSegment({ tripId, tripTitle, meName }: ExpensesSegmentPr
   const [newName, setNewName] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Expense["category"] | null>(null);
 
-  if (participants.length === 0) ensureParticipants(tripId, meName);
+  useEffect(() => {
+    if (participants.length === 0) ensureParticipants(tripId, meName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripId]);
 
   const pendingCount = expenses.filter((e) => !e.synced).length;
   const visibleExpenses = categoryFilter ? expenses.filter((e) => e.category === categoryFilter) : expenses;

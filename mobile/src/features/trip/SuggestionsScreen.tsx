@@ -9,6 +9,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { manualRecalculateSuggestion } from "../../mocks/suggestions";
+import { emptyArray } from "../../lib/emptyArray";
 import { useItineraryStore } from "../../store/itineraryStore";
 import { useSuggestionsStore } from "../../store/suggestionsStore";
 import { SuggestionCard } from "./SuggestionCard";
@@ -23,9 +24,9 @@ export default function SuggestionsScreen() {
   const applySuggestion = useItineraryStore((s) => s.applySuggestion);
   const undoLastVersion = useItineraryStore((s) => s.undoLastVersion);
 
-  const suggestions = useSuggestionsStore((s) => s.byTrip[id] ?? []);
-  const dismissedIds = useSuggestionsStore((s) => s.dismissedIds[id] ?? []);
-  const appliedIds = useSuggestionsStore((s) => s.appliedIds[id] ?? []);
+  const suggestions = useSuggestionsStore((s) => s.byTrip[id] ?? emptyArray());
+  const dismissedIds = useSuggestionsStore((s) => s.dismissedIds[id] ?? emptyArray());
+  const appliedIds = useSuggestionsStore((s) => s.appliedIds[id] ?? emptyArray());
   const lastApplied = useSuggestionsStore((s) => s.lastApplied[id]);
   const ensureGenerated = useSuggestionsStore((s) => s.ensureGenerated);
   const addManual = useSuggestionsStore((s) => s.addManual);
