@@ -28,6 +28,7 @@ import { ChecklistSegment } from "./ChecklistSegment";
 import { DayCard } from "./DayCard";
 import { DaySelector } from "./DaySelector";
 import { ExpensesSegment } from "./ExpensesSegment";
+import { JournalSegment } from "./JournalSegment";
 import { LivePositionBanner } from "./LivePositionBanner";
 import { StopDetailSheet } from "./StopDetailSheet";
 import { SuggestionCard } from "./SuggestionCard";
@@ -39,8 +40,7 @@ const REFINEMENTS: { key: "more_hiking" | "cheaper" | "less_driving"; label: str
   { key: "less_driving", label: "Moins de route", icon: "speedometer-outline" },
 ];
 
-const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire" | "budget" | "depenses" | "checklist">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
-  journal: { icon: "book-outline", title: "Journal de voyage", body: "L'enregistrement de votre trajet et vos souvenirs, bientôt." },
+const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire" | "budget" | "depenses" | "checklist" | "journal">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
   groupe: { icon: "people-circle-outline", title: "Groupe", body: "Invitez des co-voyageurs et partagez la position en direct, bientôt." },
 };
 
@@ -258,6 +258,15 @@ export default function TripDetailScreen() {
           <ExpensesSegment tripId={trip.id} tripTitle={trip.title} meName={meName} />
         ) : segment === "checklist" ? (
           <ChecklistSegment tripId={trip.id} destination={trip.destination} nightsFromItinerary={activeVersion?.days.length} />
+        ) : segment === "journal" ? (
+          <JournalSegment
+            tripId={trip.id}
+            tripTitle={trip.title}
+            tripStatus={trip.status}
+            days={activeVersion?.days}
+            totalDistanceKm={activeVersion?.totalDistanceKm ?? 0}
+            onPublish={() => setPublishOpen(true)}
+          />
         ) : !itinerary || !activeVersion ? (
           <EmptyState
             icon="map-outline"

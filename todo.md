@@ -139,12 +139,12 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Report content + block user
 
 ## Travel journal (Polarsteps)
-- [ ] Background recording of the route actually driven, battery-aware
-- [ ] Day entries auto-built from the track + stops
-- [ ] Photos / videos per step, captions, cover
-- [ ] Timeline + recap map ("2 340 km, 12 stops, 3 countries")
-- [ ] Share with family: public link + image export
-- [ ] Turn a finished journal into a publishable itinerary
+- [x] Background recording of the route actually driven, battery-aware
+- [x] Day entries auto-built from the track + stops
+- [x] Photos / videos per step, captions, cover
+- [x] Timeline + recap map ("2 340 km, 12 stops, 3 countries")
+- [x] Share with family: public link + image export
+- [x] Turn a finished journal into a publishable itinerary
 
 ## Shared trip (group)
 - [ ] Invite members: owner / editor / viewer
