@@ -155,13 +155,13 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Handle simultaneous edits
 
 ## Kids interface
-- [ ] Separate playful theme, big targets, no ads, no external links
-- [ ] Simplified live map: "we are here", time left as a visual bar
-- [ ] Upcoming points of interest as illustrated cards
-- [ ] Local fauna / flora / landmark facts by child age
-- [ ] Region quiz / mini game
-- [ ] Parental lock to enter and exit
-- [ ] Tablet layout
+- [x] Separate playful theme, big targets, no ads, no external links
+- [x] Simplified live map: "we are here", time left as a visual bar
+- [x] Upcoming points of interest as illustrated cards
+- [x] Local fauna / flora / landmark facts by child age
+- [x] Region quiz / mini game
+- [x] Parental lock to enter and exit
+- [x] Tablet layout
 
 ## International
 - [ ] FR / EN strings, date and number formatting

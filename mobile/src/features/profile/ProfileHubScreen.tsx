@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -7,8 +8,10 @@ import { tabBarReservedSpace } from "../../constants/layout";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { ParentalGate } from "../kids/ParentalGate";
 import { initialsFrom } from "../../lib/initials";
 import { useAuthStore } from "../../store/authStore";
+import { useKidsStore } from "../../store/kidsStore";
 
 /**
  * The container for everything account-scoped that isn't trip-scoped —
@@ -22,6 +25,8 @@ export default function ProfileHubScreen() {
   const { theme } = useTheme();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const enterKidsMode = useKidsStore((s) => s.enterKidsMode);
+  const [kidsGateOpen, setKidsGateOpen] = useState(false);
 
   const confirmLogout = () => {
     Alert.alert("Se déconnecter ?", "Vous devrez vous reconnecter pour accéder à vos voyages.", [
@@ -70,6 +75,8 @@ export default function ProfileHubScreen() {
               label="Mes véhicules"
               onPress={() => router.push("/profile/vehicles" as any)}
             />
+            <View style={[styles.divider, { backgroundColor: theme.colors.line }]} />
+            <ListRow icon="happy-outline" label="Mode enfant" onPress={() => setKidsGateOpen(true)} />
           </View>
         </View>
 
@@ -86,6 +93,13 @@ export default function ProfileHubScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <ParentalGate
+        visible={kidsGateOpen}
+        onClose={() => setKidsGateOpen(false)}
+        onSuccess={() => { setKidsGateOpen(false); enterKidsMode(); router.push("/kids" as any); }}
+        title="Activer le mode enfant ?"
+      />
     </View>
   );
 }
