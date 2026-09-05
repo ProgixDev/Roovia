@@ -69,7 +69,7 @@ export default function ProfileHubScreen() {
             <ListRow
               icon="person-outline"
               label="Profil voyageur"
-              onPress={() => router.push("/profile/traveler" as any)}
+              onPress={() => router.push("/profile/traveler/who" as any)}
             />
             <View style={[styles.divider, { backgroundColor: theme.colors.line }]} />
             <ListRow

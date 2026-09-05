@@ -19,6 +19,11 @@ export interface ButtonProps extends Omit<PressableProps, "style" | "onPress"> {
   loading?: boolean;
   /** Leading icon — e.g. the "+" on a create action. Hidden while loading. */
   icon?: keyof typeof Ionicons.glyphMap;
+  /** Trailing icon pinned to the button's far right edge (`justify-content:
+   * space-between` instead of a centered content row) — the "Generate my
+   * first trip →" treatment, distinct from `icon`, which stays glued to
+   * the label. Hidden while loading. */
+  trailingIcon?: keyof typeof Ionicons.glyphMap;
   onPress?: (event: GestureResponderEvent) => void;
 }
 
@@ -33,6 +38,7 @@ export function Button({
   variant = "primary",
   loading = false,
   icon,
+  trailingIcon,
   disabled,
   onPress,
   ...props
@@ -67,6 +73,12 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator color={textColor} />
+      ) : trailingIcon ? (
+        <View style={styles.trailingContent}>
+          <View style={{ width: 18 }} />
+          <Text style={[typography.button, { color: textColor }]}>{label}</Text>
+          <Ionicons name={trailingIcon} size={18} color={textColor} />
+        </View>
       ) : (
         <View style={styles.content}>
           {icon ? <Ionicons name={icon} size={18} color={textColor} /> : null}
@@ -86,4 +98,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   content: { flexDirection: "row", alignItems: "center", gap: 8 },
+  trailingContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    alignSelf: "stretch",
+  },
 });

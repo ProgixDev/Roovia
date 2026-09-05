@@ -90,6 +90,12 @@ export function formatDate(date: Date, locale = "fr-FR"): string {
   return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }).format(date);
 }
 
+/** "Octobre 2026" — for a flexible-month pick, where the day itself is noise. */
+export function formatMonthYear(date: Date, locale = "fr-FR"): string {
+  const formatted = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(date);
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
 export function formatDateRange(start: Date, end: Date, locale = "fr-FR"): string {
   const day = new Intl.DateTimeFormat(locale, { day: "numeric" });
   const full = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" });

@@ -11,9 +11,16 @@ import { searchPlaces } from "../../mocks/places";
 interface DestinationAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
+  label?: string;
+  placeholder?: string;
 }
 
-export function DestinationAutocomplete({ value, onChange }: DestinationAutocompleteProps) {
+export function DestinationAutocomplete({
+  value,
+  onChange,
+  label = "Destination",
+  placeholder = "Pays, région ou ville",
+}: DestinationAutocompleteProps) {
   const { theme } = useTheme();
   const [focused, setFocused] = useState(false);
   const results = useMemo(() => searchPlaces(value), [value]);
@@ -22,8 +29,8 @@ export function DestinationAutocomplete({ value, onChange }: DestinationAutocomp
   return (
     <View>
       <TextField
-        label="Destination"
-        placeholder="Pays, région ou ville"
+        label={label}
+        placeholder={placeholder}
         value={value}
         onChangeText={onChange}
         onFocus={() => setFocused(true)}

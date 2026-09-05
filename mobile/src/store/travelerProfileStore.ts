@@ -35,8 +35,9 @@ export interface TravelerProfile {
   maxDrivingHoursPerDay: number;
   /** 0 = nature, 1 = ville. */
   natureVsCity: number;
-  /** 0 = gratuit, 1 = payant. */
-  freeVsPaid: number;
+  /** Where they're willing to sleep — both can be true at once. */
+  freeSpots: boolean;
+  campsites: boolean;
   constraints: DatedConstraint[];
 }
 
@@ -54,7 +55,8 @@ const defaultProfile: TravelerProfile = {
   pace: 0.5,
   maxDrivingHoursPerDay: 4,
   natureVsCity: 0.5,
-  freeVsPaid: 0.5,
+  freeSpots: true,
+  campsites: true,
   constraints: [],
 };
 

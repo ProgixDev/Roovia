@@ -1,7 +1,12 @@
-// Dynamic config instead of app.json: the Mapbox download token (Maven
-// credentials for the native SDK itself, not the runtime public token) has
-// to reach the @rnmapbox/maps config plugin at prebuild time, and app.json
-// can't read process.env — only a JS config file can.
+// Everything below is plain JSON-serializable data — no process.env, no
+// computed values. This used to need JS to pass the Mapbox download token
+// via `process.env.RNMAPBOX_MAPS_DOWNLOAD_TOKEN` into the @rnmapbox/maps
+// plugin's `RNMapboxMapsDownloadToken` option. That option is deprecated —
+// it bakes the raw token into android/gradle.properties (and ios/Podfile)
+// on disk — and both the Gradle build script and the iOS podspec already
+// read `RNMAPBOX_MAPS_DOWNLOAD_TOKEN` straight from the environment on
+// their own, so the option (and the JS this file needed to reach it) is
+// gone. Nothing here still requires app.config.js over app.json.
 module.exports = ({ config }) => ({
   ...config,
   name: "roovia",
@@ -62,11 +67,7 @@ module.exports = ({ config }) => ({
     "./plugins/withReleaseSigning",
     "./plugins/withDebugSigning",
     "expo-secure-store",
-    [
-      "@rnmapbox/maps",
-      {
-        RNMapboxMapsDownloadToken: process.env.RNMAPBOX_MAPS_DOWNLOAD_TOKEN,
-      },
-    ],
+    "@rnmapbox/maps",
+    "@react-native-community/datetimepicker",
   ],
 });

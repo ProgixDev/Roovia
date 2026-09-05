@@ -27,9 +27,24 @@ export function Slider({ value, min, max, step = 1, onChange }: SliderProps) {
   const [trackWidth, setTrackWidth] = useState(0);
   const usable = Math.max(trackWidth - THUMB, 1);
 
-  const clamp = (v: number) => Math.min(max, Math.max(min, v));
-  const valueToX = (v: number) => ((clamp(v) - min) / (max - min || 1)) * usable;
+  // `'worklet'`-annotated: `.onUpdate` below calls `xToValue` (which calls
+  // `clamp`) synchronously on the UI thread. Reanimated's Babel plugin only
+  // auto-worklet-izes the callback literal passed to `.onUpdate` itself —
+  // a helper it calls that's defined outside that literal, like these,
+  // still needs the directive explicitly or the call throws at runtime.
+  // The directive doesn't stop them running on the JS thread too (the
+  // `useEffect` and the `useSharedValue` initializer below both call
+  // `valueToX` from plain JS) — a worklet is valid on both threads.
+  const clamp = (v: number) => {
+    "worklet";
+    return Math.min(max, Math.max(min, v));
+  };
+  const valueToX = (v: number) => {
+    "worklet";
+    return ((clamp(v) - min) / (max - min || 1)) * usable;
+  };
   const xToValue = (x: number) => {
+    "worklet";
     const raw = min + (x / usable) * (max - min);
     return clamp(Math.round(raw / step) * step);
   };

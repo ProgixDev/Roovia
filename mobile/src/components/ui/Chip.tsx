@@ -12,8 +12,11 @@ export interface ChipProps extends Omit<PressableProps, "style" | "onPress"> {
    * `ink` for a view filter (e.g. Home's status tabs) — a filter choosing
    * what's on screen isn't the same kind of "selected" as a form answer,
    * and filled-blaze there would visually compete with the screen's actual
-   * primary action instead of reading as a neutral toggle. */
-  tone?: "blaze" | "ink";
+   * primary action instead of reading as a neutral toggle. `tint` is a
+   * light-wash variant (low-alpha `blaze` fill, `blaze` border/text) for a
+   * multi-select field of many chips (traveler profile interests) where a
+   * solid block of orange per selection reads as too heavy. */
+  tone?: "blaze" | "ink" | "tint";
   /** Leading icon — e.g. interest chips (plage, randonnée…). */
   icon?: keyof typeof Ionicons.glyphMap;
   onPress?: () => void;
@@ -27,6 +30,30 @@ export interface ChipProps extends Omit<PressableProps, "style" | "onPress"> {
  */
 export function Chip({ label, selected, tone = "blaze", icon, onPress, ...props }: ChipProps) {
   const { theme } = useTheme();
+
+  if (tone === "tint") {
+    const textColor = selected ? theme.colors.blaze : theme.colors.ink;
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: !!selected }}
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.chip,
+          {
+            backgroundColor: selected ? `${theme.colors.blaze}1F` : theme.colors.surface,
+            borderColor: selected ? theme.colors.blaze : theme.colors.line,
+            opacity: pressed ? 0.85 : 1,
+          },
+        ]}
+        {...props}
+      >
+        {icon ? <Ionicons name={icon} size={16} color={textColor} style={styles.icon} /> : null}
+        <Text style={[typography.button, { color: textColor }]}>{label}</Text>
+      </Pressable>
+    );
+  }
+
   const fill = tone === "blaze" ? theme.colors.blaze : theme.colors.ink;
   const onFill = tone === "blaze" ? theme.colors.blazeInk : theme.colors.ground;
   const textColor = selected ? onFill : theme.colors.ink;
