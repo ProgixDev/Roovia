@@ -6,27 +6,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { EmptyState } from "../../../components/ui/EmptyState";
 import { ListRow } from "../../../components/ui/ListRow";
-import { tabBarReservedSpace } from "../../../constants/layout";
 import { radius } from "../../../constants/themes";
 import { typography } from "../../../constants/typography";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { INTEREST_LABEL, PARTY_LABEL } from "../../../features/traveler/labels";
 import { useTravelerProfileStore } from "../../../store/travelerProfileStore";
-
-const PARTY_LABEL: Record<string, string> = {
-  solo: "Solo",
-  couple: "En couple",
-  family: "En famille",
-  friends: "Entre amis",
-};
-
-const INTEREST_LABEL: Record<string, string> = {
-  beach: "Plage",
-  hiking: "Randonnée",
-  sport: "Sport",
-  museums: "Musées",
-  food: "Gastronomie",
-  nature: "Nature",
-};
 
 /**
  * The editable hub §1 hangs off — one card per wizard step, showing its
@@ -66,7 +50,8 @@ export default function TravelerProfileHubScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.ground }}>
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: tabBarReservedSpace(insets.bottom) + 24 }]}
+        // A root-level stack route, like /account — no tab bar to clear here.
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}
       >
         <Text style={[typography.sectionHead, { color: theme.colors.ink }]}>Profil voyageur</Text>
 

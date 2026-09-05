@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionSheet, type ActionSheetAction } from "../../../components/ui/ActionSheet";
 import { Button } from "../../../components/ui/Button";
 import { EmptyState } from "../../../components/ui/EmptyState";
-import { tabBarReservedSpace } from "../../../constants/layout";
 import { VehicleCard } from "../../../features/vehicle/VehicleCard";
 import { useSettingsStore } from "../../../store/settingsStore";
 import { useVehiclesStore } from "../../../store/vehiclesStore";
@@ -51,10 +50,11 @@ export default function VehicleGarageScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.ground }}>
       <ScrollView
+        // A root-level stack route, like /account — no tab bar to clear here.
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingTop: 16,
-          paddingBottom: tabBarReservedSpace(insets.bottom) + 24,
+          paddingBottom: insets.bottom + 24,
           gap: 14,
         }}
       >
