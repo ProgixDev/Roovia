@@ -19,6 +19,7 @@ import { useSuggestionsStore } from "../../store/suggestionsStore";
 import { useTripsStore } from "../../store/tripsStore";
 import { useVehiclesStore } from "../../store/vehiclesStore";
 import type { Stop } from "../../mocks/itineraries";
+import { BudgetDashboard } from "./BudgetDashboard";
 import { BudgetSummary } from "./BudgetSummary";
 import { DayCard } from "./DayCard";
 import { DaySelector } from "./DaySelector";
@@ -33,8 +34,7 @@ const REFINEMENTS: { key: "more_hiking" | "cheaper" | "less_driving"; label: str
   { key: "less_driving", label: "Moins de route", icon: "speedometer-outline" },
 ];
 
-const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
-  budget: { icon: "wallet-outline", title: "Budget", body: "Le suivi estimé vs réel arrive dans cette section." },
+const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire" | "budget">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
   depenses: { icon: "people-outline", title: "Dépenses partagées", body: "Ajoutez et répartissez les dépenses du groupe ici, bientôt." },
   checklist: { icon: "checkbox-outline", title: "Checklist", body: "La liste de départ générée pour ce voyage arrivera ici." },
   journal: { icon: "book-outline", title: "Journal de voyage", body: "L'enregistrement de votre trajet et vos souvenirs, bientôt." },
@@ -216,14 +216,21 @@ export default function TripDetailScreen() {
         segment={segment}
         onChangeSegment={setSegment}
       >
-        {segment !== "itineraire" ? (
-          <EmptyState {...PLACEHOLDER_COPY[segment]} />
-        ) : !itinerary || !activeVersion ? (
+        {!itinerary || !activeVersion ? (
           <EmptyState
             icon="map-outline"
             title="Pas encore d'itinéraire"
             body="Ce voyage n'a pas été généré par l'IA — l'itinéraire détaillé n'est pas encore disponible."
           />
+        ) : segment === "budget" ? (
+          <BudgetDashboard
+            days={activeVersion.days}
+            totalDistanceKm={activeVersion.totalDistanceKm}
+            activeVehicle={activeVehicle}
+            onMakeItCheaper={() => refine(trip.id, "cheaper", "Moins cher")}
+          />
+        ) : segment !== "itineraire" ? (
+          <EmptyState {...PLACEHOLDER_COPY[segment]} />
         ) : (
           <>
             {visibleSuggestions.length > 0 ? (

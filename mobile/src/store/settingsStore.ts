@@ -5,38 +5,53 @@ import type { UnitSystem } from "../lib/format";
 
 const STORAGE_KEY = "@settings";
 
-interface SettingsState {
+export type Currency = "EUR" | "USD" | "GBP" | "CHF";
+
+interface PersistedShape {
   units: UnitSystem;
+  currency: Currency;
+}
+
+interface SettingsState extends PersistedShape {
   hydrate(): Promise<void>;
   setUnits(units: UnitSystem): Promise<void>;
+  setCurrency(currency: Currency): Promise<void>;
+}
+
+async function persist(state: PersistedShape): Promise<void> {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Best-effort, same as every other store in this app.
+  }
 }
 
 /**
- * Starts minimal — just the unit system §2's dimension fields need right
- * now. Locale and currency join this same store when todo.md's
- * "International" section (§14) and "Budget" (§7) need them, rather than
- * being pre-declared here unused.
+ * Locale joins this store when todo.md's "International" section (§14)
+ * needs it, rather than being pre-declared here unused.
  */
-export const useSettingsStore = create<SettingsState>((set) => ({
+export const useSettingsStore = create<SettingsState>((set, get) => ({
   units: "metric",
+  currency: "EUR",
 
   async hydrate() {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      const saved = JSON.parse(raw) as Partial<{ units: UnitSystem }>;
-      if (saved.units) set({ units: saved.units });
+      const saved = JSON.parse(raw) as Partial<PersistedShape>;
+      set({ units: saved.units ?? "metric", currency: saved.currency ?? "EUR" });
     } catch {
-      // Storage unavailable — default stands.
+      // Storage unavailable — defaults stand.
     }
   },
 
   async setUnits(units) {
     set({ units });
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ units }));
-    } catch {
-      // Best-effort, same as every other store in this app.
-    }
+    await persist({ units, currency: get().currency });
+  },
+
+  async setCurrency(currency) {
+    set({ currency });
+    await persist({ units: get().units, currency });
   },
 }));

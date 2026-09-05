@@ -68,8 +68,22 @@ export function displayToConsumption(value: number, unit: UnitSystem): number {
   return unit === "imperial" ? 235.215 / value : value;
 }
 
+// Static — a real rate feed is backend scope (see IMPLEMENTATION_PLAN.md
+// §7's "cached rates"). Every stored price in this app is EUR; this is the
+// one place that fact matters.
+const EUR_EXCHANGE_RATES: Record<string, number> = { EUR: 1, USD: 1.08, GBP: 0.86, CHF: 0.95 };
+
+export function convertFromEur(amountEur: number, currency: string): number {
+  return amountEur * (EUR_EXCHANGE_RATES[currency] ?? 1);
+}
+
 export function formatCurrency(amount: number, currency = "EUR", locale = "fr-FR"): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+}
+
+/** Converts a EUR amount to `currency` and formats it in one step — what every budget/expense display actually wants. */
+export function formatEurAs(amountEur: number, currency: string, locale = "fr-FR"): string {
+  return formatCurrency(convertFromEur(amountEur, currency), currency, locale);
 }
 
 export function formatDate(date: Date, locale = "fr-FR"): string {

@@ -106,11 +106,11 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Save POI to favorites
 
 ## Budget
-- [ ] Dashboard: estimated vs actual, per category, per day
-- [ ] Fuel cost from vehicle consumption + live prices
-- [ ] Cost per person for group trips
-- [ ] Over-budget warning + "make it cheaper" action
-- [ ] Multi-currency
+- [x] Dashboard: estimated vs actual, per category, per day
+- [x] Fuel cost from vehicle consumption + live prices
+- [x] Cost per person for group trips
+- [x] Over-budget warning + "make it cheaper" action
+- [x] Multi-currency
 
 ## Shared expenses (Tricount)
 - [ ] Create group + invite by link or code
