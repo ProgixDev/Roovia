@@ -11,9 +11,11 @@ import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { RooviaMap } from "../map/RooviaMap";
-import { interpolateAlongRoute } from "../map/useMapRegion";
+import { interpolateAlongRoute, scrubCoordinate } from "../map/useMapRegion";
 import type { MapPinData } from "../map/types";
+import { PublishSheet } from "../community/PublishSheet";
 import { useAuthStore } from "../../store/authStore";
+import { useCommunityStore, type Visibility } from "../../store/communityStore";
 import { useGenerationStore } from "../../store/generationStore";
 import { useItineraryStore } from "../../store/itineraryStore";
 import { useSuggestionsStore } from "../../store/suggestionsStore";
@@ -56,6 +58,7 @@ export default function TripDetailScreen() {
   const removeTrip = useTripsStore((s) => s.remove);
   const startTrip = useTripsStore((s) => s.startTrip);
   const finishTrip = useTripsStore((s) => s.finishTrip);
+  const publishToCommunity = useCommunityStore((s) => s.publish);
 
   const itinerary = useItineraryStore((s) => s.itineraries[id]);
   const toggleLock = useItineraryStore((s) => s.toggleLock);
@@ -82,6 +85,7 @@ export default function TripDetailScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [refineOpen, setRefineOpen] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
 
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -147,10 +151,40 @@ export default function TripDetailScreen() {
     ]);
   };
 
+  const publishTrip = (visibility: Visibility, scrub: boolean) => {
+    if (!activeVersion) return;
+    const days = activeVersion.days.map((day) => ({
+      ...day,
+      stops: day.stops.map((stop) =>
+        scrub && (stop.kind === "sleep_free" || stop.kind === "sleep_paid")
+          ? { ...stop, coordinate: scrubCoordinate(stop.coordinate) }
+          : stop,
+      ),
+    }));
+    publishToCommunity(
+      {
+        id: `community_mine_${trip.id}`,
+        title: trip.title,
+        country: trip.destination,
+        vehicleType: activeVehicle?.type ?? "van",
+        season: "ete",
+        durationNights: activeVersion.days.length,
+        budgetEur: activeVersion.totalBudgetEur,
+        ratingOutOf5: 0,
+        cover: trip.cover,
+        author: { id: "me", name: meName, badges: [], spotsContributed: 0 },
+        itinerary: { title: trip.title, destination: trip.destination, days, totalDistanceKm: activeVersion.totalDistanceKm, totalBudgetEur: activeVersion.totalBudgetEur },
+        reviews: [],
+      },
+      visibility,
+    );
+  };
+
   const menuActions: ActionSheetAction[] = [
     { key: "duplicate", label: "Dupliquer", icon: "copy-outline", onPress: () => duplicateTrip(trip.id) },
     { key: "archive", label: "Archiver", icon: "archive-outline", onPress: () => { archiveTrip(trip.id); goBack(); } },
     { key: "share", label: "Partager", icon: "share-outline", onPress: share },
+    ...(activeVersion ? [{ key: "publish", label: "Publier sur la communauté", icon: "cloud-upload-outline", onPress: () => setPublishOpen(true) } as ActionSheetAction] : []),
     { key: "delete", label: "Supprimer", icon: "trash-outline", destructive: true, onPress: confirmDelete },
   ];
 
@@ -329,6 +363,7 @@ export default function TripDetailScreen() {
           if (day) removeStop(trip.id, day.id, selectedStop.id);
         }}
       />
+      <PublishSheet visible={publishOpen} onClose={() => setPublishOpen(false)} onPublish={publishTrip} />
     </View>
   );
 }

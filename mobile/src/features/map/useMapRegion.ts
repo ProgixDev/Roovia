@@ -65,6 +65,15 @@ export function useProjector(points: LatLng[], size: number, padding: number) {
  * true constant-speed motion along the route, just a point that visibly
  * advances stop by stop. `t` is clamped to [0, 1].
  */
+/** Up to ~500m of random jitter — the "flouter les coordonnées sensibles" option on publish (§10), for a bivouac or home spot someone would rather not pinpoint exactly. */
+export function scrubCoordinate(coord: LatLng): LatLng {
+  const jitterDegrees = 0.0045;
+  return {
+    latitude: coord.latitude + (Math.random() - 0.5) * 2 * jitterDegrees,
+    longitude: coord.longitude + (Math.random() - 0.5) * 2 * jitterDegrees,
+  };
+}
+
 export function interpolateAlongRoute(coordinates: LatLng[], t: number): LatLng | null {
   if (coordinates.length === 0) return null;
   if (coordinates.length === 1) return coordinates[0];

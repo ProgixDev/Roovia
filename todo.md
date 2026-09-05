@@ -129,14 +129,14 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Save as reusable template
 
 ## Community
-- [ ] Feed of shared itineraries, filters: country, duration, budget, vehicle type, season
-- [ ] Public itinerary detail with map preview + stats
-- [ ] "Take this trip and adapt it to my profile"
-- [ ] Rate + review itineraries and spots
-- [ ] Publish my itinerary, with coordinate privacy scrub on home / bivouac
-- [ ] Public user profile: trips, spots contributed, badges
-- [ ] Follow / favorites
-- [ ] Report content + block user
+- [x] Feed of shared itineraries, filters: country, duration, budget, vehicle type, season
+- [x] Public itinerary detail with map preview + stats
+- [x] "Take this trip and adapt it to my profile"
+- [x] Rate + review itineraries and spots
+- [x] Publish my itinerary, with coordinate privacy scrub on home / bivouac
+- [x] Public user profile: trips, spots contributed, badges
+- [x] Follow / favorites
+- [x] Report content + block user
 
 ## Travel journal (Polarsteps)
 - [ ] Background recording of the route actually driven, battery-aware
