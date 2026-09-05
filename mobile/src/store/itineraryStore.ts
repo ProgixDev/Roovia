@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import type { GeneratedItinerary, Stop, TripDay } from "../mocks/itineraries";
+import type { Suggestion } from "../mocks/suggestions";
 
 export interface ItineraryVersion {
   id: string;
@@ -32,6 +33,10 @@ interface ItineraryState {
   moveStop(tripId: string, dayId: string, stopId: string, direction: "up" | "down"): void;
   removeStop(tripId: string, dayId: string, stopId: string): void;
   addStop(tripId: string, dayId: string, stop: Stop): void;
+  /** Accepting a re-route suggestion (§5) — a new version, same as refine, so "undo" is just a pointer move. */
+  applySuggestion(tripId: string, suggestion: Suggestion): void;
+  /** Steps `activeVersionId` back one version — the "annuler le recalcul" affordance. */
+  undoLastVersion(tripId: string): void;
 }
 
 function toVersion(result: GeneratedItinerary, label: string): ItineraryVersion {
@@ -143,5 +148,55 @@ export const useItineraryStore = create<ItineraryState>((set, get) => ({
       days.map((day) => (day.id === dayId ? { ...day, stops: [...day.stops, stop] } : day)),
     );
     set({ itineraries: { ...get().itineraries, [tripId]: updated } });
+  },
+
+  applySuggestion(tripId, suggestion) {
+    const current = get().itineraries[tripId];
+    if (!current) return;
+    const activeVersion = current.versions.find((v) => v.id === current.activeVersionId);
+    if (!activeVersion) return;
+
+    const days = activeVersion.days.map((day) => {
+      if (day.id !== suggestion.dayId) return day;
+      const kept = suggestion.stopId ? day.stops.filter((s) => s.id !== suggestion.stopId) : day.stops;
+      // A suggested stop has no real place behind it — it inherits the
+      // replaced stop's coordinate (or the day's first stop, absent that)
+      // as a plausible position rather than {0,0}.
+      const fallbackCoordinate = day.stops.find((s) => s.id === suggestion.stopId)?.coordinate ?? day.stops[0]?.coordinate;
+      const added: Stop[] = fallbackCoordinate
+        ? suggestion.diff.addedStopNames.map((name, i) => ({
+            id: `stop_suggested_${Date.now()}_${i}`,
+            name,
+            kind: "visit" as const,
+            description: "Ajouté suite à une suggestion de recalcul.",
+            coordinate: fallbackCoordinate,
+            driveTimeMinFromPrev: null,
+            priceEur: null,
+          }))
+        : [];
+      return { ...day, stops: [...kept, ...added] };
+    });
+
+    const version: ItineraryVersion = {
+      id: `version_${Date.now()}_${Math.round(Math.random() * 1000)}`,
+      label: suggestion.title,
+      createdAt: Date.now(),
+      days,
+      totalDistanceKm: Math.max(0, activeVersion.totalDistanceKm + suggestion.diff.deltaKm),
+      totalBudgetEur: Math.max(0, activeVersion.totalBudgetEur + suggestion.diff.deltaEur),
+    };
+    const updated: Itinerary = {
+      ...current,
+      versions: [...current.versions, version],
+      activeVersionId: version.id,
+    };
+    set({ itineraries: { ...get().itineraries, [tripId]: updated } });
+  },
+
+  undoLastVersion(tripId) {
+    const current = get().itineraries[tripId];
+    if (!current || current.versions.length < 2) return;
+    const previous = current.versions[current.versions.length - 2];
+    set({ itineraries: { ...get().itineraries, [tripId]: { ...current, activeVersionId: previous.id } } });
   },
 }));

@@ -15,6 +15,7 @@ import { interpolateAlongRoute } from "../map/useMapRegion";
 import type { MapPinData } from "../map/types";
 import { useGenerationStore } from "../../store/generationStore";
 import { useItineraryStore } from "../../store/itineraryStore";
+import { useSuggestionsStore } from "../../store/suggestionsStore";
 import { useTripsStore } from "../../store/tripsStore";
 import { useVehiclesStore } from "../../store/vehiclesStore";
 import type { Stop } from "../../mocks/itineraries";
@@ -23,6 +24,7 @@ import { DayCard } from "./DayCard";
 import { DaySelector } from "./DaySelector";
 import { LivePositionBanner } from "./LivePositionBanner";
 import { StopDetailSheet } from "./StopDetailSheet";
+import { SuggestionCard } from "./SuggestionCard";
 import { TripDetailShell, type TripSegment } from "./TripDetailShell";
 
 const REFINEMENTS: { key: "more_hiking" | "cheaper" | "less_driving"; label: string; icon: ActionSheetAction["icon"] }[] = [
@@ -57,7 +59,15 @@ export default function TripDetailScreen() {
   const moveStop = useItineraryStore((s) => s.moveStop);
   const removeStop = useItineraryStore((s) => s.removeStop);
   const setActiveVersion = useItineraryStore((s) => s.setActiveVersion);
+  const applySuggestion = useItineraryStore((s) => s.applySuggestion);
   const refine = useGenerationStore((s) => s.refine);
+
+  const suggestions = useSuggestionsStore((s) => s.byTrip[id] ?? []);
+  const dismissedSuggestionIds = useSuggestionsStore((s) => s.dismissedIds[id] ?? []);
+  const appliedSuggestionIds = useSuggestionsStore((s) => s.appliedIds[id] ?? []);
+  const ensureSuggestionsGenerated = useSuggestionsStore((s) => s.ensureGenerated);
+  const dismissSuggestion = useSuggestionsStore((s) => s.dismiss);
+  const markSuggestionApplied = useSuggestionsStore((s) => s.markApplied);
 
   const activeVehicle = useVehiclesStore((s) => s.vehicles.find((v) => v.id === s.activeId)) ?? null;
 
@@ -79,6 +89,17 @@ export default function TripDetailScreen() {
   const visibleDays = activeDayId ? activeVersion?.days.filter((d) => d.id === activeDayId) : activeVersion?.days;
   const routeCoordinates = (visibleDays ?? []).flatMap((day) => day.stops.map((s) => s.coordinate));
   const allStopsInOrder = activeVersion?.days.flatMap((d) => d.stops) ?? [];
+
+  const activeVersionDayCount = activeVersion?.days.length;
+  useEffect(() => {
+    if (activeVersion) ensureSuggestionsGenerated(id, activeVersion.days);
+    // Suggestions only need generating once per trip — see the store's own doc.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, activeVersionDayCount]);
+
+  const visibleSuggestions = suggestions.filter(
+    (sg) => !dismissedSuggestionIds.includes(sg.id) && !appliedSuggestionIds.includes(sg.id),
+  );
 
   useEffect(() => {
     if (playing) {
@@ -205,6 +226,26 @@ export default function TripDetailScreen() {
           />
         ) : (
           <>
+            {visibleSuggestions.length > 0 ? (
+              <View style={{ gap: 10 }}>
+                {visibleSuggestions.slice(0, 2).map((suggestion) => (
+                  <SuggestionCard
+                    key={suggestion.id}
+                    suggestion={suggestion}
+                    applied={false}
+                    onAccept={() => { applySuggestion(trip.id, suggestion); markSuggestionApplied(trip.id, suggestion.id); }}
+                    onDismiss={() => dismissSuggestion(trip.id, suggestion.id)}
+                    onEdit={() => { dismissSuggestion(trip.id, suggestion.id); setActiveDayId(suggestion.dayId); }}
+                  />
+                ))}
+                <Button
+                  label={visibleSuggestions.length > 2 ? `Voir les ${visibleSuggestions.length} suggestions` : "Voir les suggestions"}
+                  variant="secondary"
+                  onPress={() => router.push(`/trip/${trip.id}/suggestions` as any)}
+                />
+              </View>
+            ) : null}
+
             <BudgetSummary days={activeVersion.days} totalBudgetEur={activeVersion.totalBudgetEur} />
 
             <View style={styles.actionsRow}>

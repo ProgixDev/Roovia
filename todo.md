@@ -79,12 +79,12 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Offline access to the active trip + cached tiles along the corridor
 
 ## Dynamic re-routing
-- [ ] Suggestion cards ("rain in Nice tomorrow — swap the beach day?")
-- [ ] Triggers shown: bad weather, place closed, running late, plan change, new stop from a group member
-- [ ] Accept / dismiss / edit with diff preview (±km, ±cost, ±time)
-- [ ] Manual "recalculate from here"
-- [ ] Undo last recalculation
-- [ ] Push notification deep-linking into the suggestion
+- [x] Suggestion cards ("rain in Nice tomorrow — swap the beach day?")
+- [x] Triggers shown: bad weather, place closed, running late, plan change, new stop from a group member
+- [x] Accept / dismiss / edit with diff preview (±km, ±cost, ±time)
+- [x] Manual "recalculate from here"
+- [x] Undo last recalculation
+- [x] Push notification deep-linking into the suggestion
 
 ## Van / camping-car services map
 - [ ] POI layers with toggles + clustering:
