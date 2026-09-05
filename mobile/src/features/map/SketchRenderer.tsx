@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, View, type LayoutChangeEvent } from "react-native";
+import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 
+import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { MapCluster } from "./MapCluster";
 import { MapPin } from "./MapPin";
@@ -34,7 +35,7 @@ function ContourLines({ color }: { color: string }) {
 }
 
 /** Same input contract as `MapboxRenderer` — nothing above this decides which one is live, see `RooviaMap`. */
-export function SketchRenderer({ route, pins = [], activeId, onPressPin, liveMarker, interactive = true, style }: RooviaMapProps) {
+export function SketchRenderer({ route, pins = [], activeId, onPressPin, liveMarker, memberMarkers = [], interactive = true, style }: RooviaMapProps) {
   const { theme } = useTheme();
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
 
@@ -50,10 +51,16 @@ export function SketchRenderer({ route, pins = [], activeId, onPressPin, liveMar
     setViewport({ width, height });
   }, []);
 
-  const allPoints = [...(route?.coordinates ?? []), ...pins.map((p) => p.coordinate), ...(liveMarker ? [liveMarker] : [])];
+  const allPoints = [
+    ...(route?.coordinates ?? []),
+    ...pins.map((p) => p.coordinate),
+    ...(liveMarker ? [liveMarker] : []),
+    ...memberMarkers.map((m) => m.coordinate),
+  ];
   const project = createProjector(allPoints, CANVAS, PADDING);
   const routePoints: Point[] = route ? route.coordinates.map(project) : [];
   const liveMarkerAt = liveMarker ? project(liveMarker) : null;
+  const projectedMembers = memberMarkers.map((m) => ({ member: m, at: project(m.coordinate) }));
 
   // Cluster pins that land within CLUSTER_DISTANCE canvas units of each other.
   const projectedPins = pins.map((pin) => ({ pin, at: project(pin.coordinate) }));
@@ -140,6 +147,15 @@ export function SketchRenderer({ route, pins = [], activeId, onPressPin, liveMar
               <View style={[styles.liveMarkerDot, { backgroundColor: theme.colors.blaze }]} />
             </View>
           ) : null}
+
+          {projectedMembers.map(({ member, at }) => (
+            <View
+              key={member.id}
+              style={[styles.memberAvatar, { left: at.x - 15, top: at.y - 15, backgroundColor: theme.colors.moss, borderColor: theme.colors.ground }]}
+            >
+              <Text style={[typography.caption, styles.memberInitials]}>{member.initials}</Text>
+            </View>
+          ))}
         </Animated.View>
       </GestureDetector>
     </View>
@@ -159,4 +175,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   liveMarkerDot: { width: 12, height: 12, borderRadius: 6 },
+  memberAvatar: {
+    position: "absolute",
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  memberInitials: { color: "#FFFFFF", fontSize: 11, textTransform: "none", letterSpacing: 0 },
 });

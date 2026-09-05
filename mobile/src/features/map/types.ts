@@ -76,13 +76,22 @@ export interface MapRouteData {
   coordinates: LatLng[];
 }
 
+export interface MemberMarker {
+  id: string;
+  coordinate: LatLng;
+  /** 1-2 letters, same convention as `lib/initials.ts` — rendered inside the dot instead of a plain circle. */
+  initials: string;
+}
+
 export interface RooviaMapProps {
   route?: MapRouteData;
   pins?: MapPinData[];
   activeId?: string | null;
   onPressPin?: (id: string) => void;
-  /** A moving position, not a place — a live-trip marker (§4) or a group member's convoy position (§12). Rendered as a plain dot, never a category pin. */
+  /** A moving position, not a place — this trip's own live position (§4). Rendered as a plain dot, never a category pin. */
   liveMarker?: LatLng;
+  /** Other people's live positions (§12's group convoy) — same idea as `liveMarker`, plural and labeled since more than one can be on screen at once. */
+  memberMarkers?: MemberMarker[];
   /** Pan/pinch enabled. Off for small static previews (recap cards, thumbnails). */
   interactive?: boolean;
   style?: StyleProp<ViewStyle>;

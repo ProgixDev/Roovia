@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Mapbox from "@rnmapbox/maps";
 
+import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { MapPin } from "./MapPin";
 import type { LatLng, RooviaMapProps } from "./types";
@@ -23,18 +24,23 @@ if (PUBLIC_TOKEN) {
 const toPosition = (p: LatLng): [number, number] => [p.longitude, p.latitude];
 
 /** Same input contract as `SketchRenderer` — see `RooviaMap` for the switch between the two. */
-export function MapboxRenderer({ route, pins = [], activeId, onPressPin, liveMarker, interactive = true, style }: RooviaMapProps) {
+export function MapboxRenderer({ route, pins = [], activeId, onPressPin, liveMarker, memberMarkers = [], interactive = true, style }: RooviaMapProps) {
   const { theme } = useTheme();
 
   const bounds = useMemo(() => {
-    const allPoints = [...(route?.coordinates ?? []), ...pins.map((p) => p.coordinate), ...(liveMarker ? [liveMarker] : [])];
+    const allPoints = [
+      ...(route?.coordinates ?? []),
+      ...pins.map((p) => p.coordinate),
+      ...(liveMarker ? [liveMarker] : []),
+      ...memberMarkers.map((m) => m.coordinate),
+    ];
     const b = computeBounds(allPoints);
     if (!b) return undefined;
     return {
       ne: toPosition({ latitude: b.maxLat, longitude: b.maxLng }),
       sw: toPosition({ latitude: b.minLat, longitude: b.minLng }),
     };
-  }, [route, pins, liveMarker]);
+  }, [route, pins, liveMarker, memberMarkers]);
 
   const routeShape = useMemo(
     () =>
@@ -84,6 +90,14 @@ export function MapboxRenderer({ route, pins = [], activeId, onPressPin, liveMar
             </View>
           </Mapbox.MarkerView>
         ) : null}
+
+        {memberMarkers.map((member) => (
+          <Mapbox.MarkerView key={member.id} coordinate={toPosition(member.coordinate)}>
+            <View style={[styles.memberAvatar, { backgroundColor: theme.colors.moss, borderColor: theme.colors.ground }]}>
+              <Text style={[typography.caption, styles.memberInitials]}>{member.initials}</Text>
+            </View>
+          </Mapbox.MarkerView>
+        ))}
       </Mapbox.MapView>
     </View>
   );
@@ -100,4 +114,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   liveMarkerDot: { width: 12, height: 12, borderRadius: 6 },
+  memberAvatar: { width: 30, height: 30, borderRadius: 15, borderWidth: 2, alignItems: "center", justifyContent: "center" },
+  memberInitials: { color: "#FFFFFF", fontSize: 11, textTransform: "none", letterSpacing: 0 },
 });

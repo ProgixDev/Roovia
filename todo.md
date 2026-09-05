@@ -147,12 +147,12 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Turn a finished journal into a publishable itinerary
 
 ## Shared trip (group)
-- [ ] Invite members: owner / editor / viewer
-- [ ] Several vehicles in one convoy
-- [ ] Live location sharing + avatars on map
-- [ ] Member proposes a spot → group notified → approve → recalculation
-- [ ] Per-stop comments
-- [ ] Handle simultaneous edits
+- [x] Invite members: owner / editor / viewer
+- [x] Several vehicles in one convoy
+- [x] Live location sharing + avatars on map
+- [x] Member proposes a spot → group notified → approve → recalculation
+- [x] Per-stop comments
+- [x] Handle simultaneous edits
 
 ## Kids interface
 - [ ] Separate playful theme, big targets, no ads, no external links

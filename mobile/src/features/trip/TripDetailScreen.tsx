@@ -28,6 +28,7 @@ import { ChecklistSegment } from "./ChecklistSegment";
 import { DayCard } from "./DayCard";
 import { DaySelector } from "./DaySelector";
 import { ExpensesSegment } from "./ExpensesSegment";
+import { GroupSegment } from "./GroupSegment";
 import { JournalSegment } from "./JournalSegment";
 import { LivePositionBanner } from "./LivePositionBanner";
 import { StopDetailSheet } from "./StopDetailSheet";
@@ -39,10 +40,6 @@ const REFINEMENTS: { key: "more_hiking" | "cheaper" | "less_driving"; label: str
   { key: "cheaper", label: "Moins cher", icon: "cash-outline" },
   { key: "less_driving", label: "Moins de route", icon: "speedometer-outline" },
 ];
-
-const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire" | "budget" | "depenses" | "checklist" | "journal">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
-  groupe: { icon: "people-circle-outline", title: "Groupe", body: "Invitez des co-voyageurs et partagez la position en direct, bientôt." },
-};
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -65,6 +62,7 @@ export default function TripDetailScreen() {
   const toggleFavorite = useItineraryStore((s) => s.toggleFavorite);
   const moveStop = useItineraryStore((s) => s.moveStop);
   const removeStop = useItineraryStore((s) => s.removeStop);
+  const addStop = useItineraryStore((s) => s.addStop);
   const setActiveVersion = useItineraryStore((s) => s.setActiveVersion);
   const applySuggestion = useItineraryStore((s) => s.applySuggestion);
   const refine = useGenerationStore((s) => s.refine);
@@ -267,6 +265,27 @@ export default function TripDetailScreen() {
             totalDistanceKm={activeVersion?.totalDistanceKm ?? 0}
             onPublish={() => setPublishOpen(true)}
           />
+        ) : segment === "groupe" ? (
+          <GroupSegment
+            tripId={trip.id}
+            tripTitle={trip.title}
+            meName={meName}
+            routeCoordinates={routeCoordinates}
+            allStops={allStopsInOrder}
+            onApproveProposal={(stopName, description) => {
+              const firstDay = activeVersion?.days[0];
+              if (!firstDay) return;
+              addStop(trip.id, firstDay.id, {
+                id: `stop_proposal_${Date.now()}`,
+                name: stopName,
+                kind: "visit",
+                description: description || "Proposé par un membre du groupe.",
+                coordinate: firstDay.stops[0]?.coordinate ?? { latitude: 0, longitude: 0 },
+                driveTimeMinFromPrev: null,
+                priceEur: null,
+              });
+            }}
+          />
         ) : !itinerary || !activeVersion ? (
           <EmptyState
             icon="map-outline"
@@ -280,8 +299,6 @@ export default function TripDetailScreen() {
             activeVehicle={activeVehicle}
             onMakeItCheaper={() => refine(trip.id, "cheaper", "Moins cher")}
           />
-        ) : segment !== "itineraire" ? (
-          <EmptyState {...PLACEHOLDER_COPY[segment]} />
         ) : (
           <>
             {visibleSuggestions.length > 0 ? (
