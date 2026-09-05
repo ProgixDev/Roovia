@@ -9,6 +9,8 @@ import { FieldGroup } from "../../components/ui/FieldGroup";
 import { radius } from "../../constants/themes";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { PaywallSheet } from "../paywall/PaywallSheet";
+import { useEntitlementsStore } from "../../store/entitlementsStore";
 import { useGenerationStore } from "../../store/generationStore";
 import { useTravelerProfileStore } from "../../store/travelerProfileStore";
 import { useVehiclesStore } from "../../store/vehiclesStore";
@@ -32,12 +34,23 @@ export default function PromptScreen() {
   const activeVehicle = vehicles.find((v) => v.id === activeVehicleId) ?? null;
   const [prompt, setPrompt] = useState("");
   const [chips, setChips] = useState<string[]>(() => buildContextChips(profile, activeVehicle));
+  const [paywallOpen, setPaywallOpen] = useState(false);
+
+  const entitlement = useEntitlementsStore((s) => s.entitlement);
+  const canGenerateQuota = useEntitlementsStore((s) => s.canGenerate);
+  const generationsRemaining = useEntitlementsStore((s) => s.generationsRemaining);
+  const recordGeneration = useEntitlementsStore((s) => s.recordGeneration);
 
   const removeChip = (chip: string) => setChips((prev) => prev.filter((c) => c !== chip));
 
-  const canGenerate = prompt.trim().length > 0 || chips.length > 0;
+  const hasInput = prompt.trim().length > 0 || chips.length > 0;
 
   const generate = async () => {
+    if (!canGenerateQuota()) {
+      setPaywallOpen(true);
+      return;
+    }
+    recordGeneration();
     router.push("/generate/running" as any);
     await start(prompt, profile.destination, profile.nights, profile.budgetEur);
   };
@@ -54,6 +67,15 @@ export default function PromptScreen() {
           <Ionicons name="close" size={20} color={theme.colors.ink} />
         </Pressable>
       </View>
+
+      {!entitlement.active ? (
+        <View style={styles.quotaRow}>
+          <Ionicons name="sparkles-outline" size={14} color={theme.colors.inkMuted} />
+          <Text style={[typography.caption, { color: theme.colors.inkMuted, textTransform: "none", letterSpacing: 0 }]}>
+            {generationsRemaining()} génération{generationsRemaining() > 1 ? "s" : ""} restante{generationsRemaining() > 1 ? "s" : ""} ce mois-ci
+          </Text>
+        </View>
+      ) : null}
 
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={[typography.sectionHead, { color: theme.colors.ink }]}>Décrivez votre voyage</Text>
@@ -105,19 +127,22 @@ export default function PromptScreen() {
       </ScrollView>
 
       <View style={[styles.footer, { backgroundColor: theme.colors.ground, paddingBottom: insets.bottom + 20 }]}>
-        <Button label="Générer mon voyage" icon="sparkles" onPress={generate} disabled={!canGenerate} />
+        <Button label="Générer mon voyage" icon="sparkles" onPress={generate} disabled={!hasInput} />
         <Pressable onPress={() => router.push("/generate/guided" as any)} style={styles.guidedLink}>
           <Text style={[typography.button, { color: theme.colors.inkMuted }]}>
             Préférer un formulaire guidé
           </Text>
         </Pressable>
       </View>
+
+      <PaywallSheet visible={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   header: { paddingHorizontal: 20, alignItems: "flex-end" },
+  quotaRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 20, marginTop: 4 },
   close: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   scroll: { paddingHorizontal: 20, paddingTop: 20, gap: 24, paddingBottom: 24 },
   inputBox: { borderRadius: radius.md, borderWidth: 1, padding: 16, minHeight: 120 },

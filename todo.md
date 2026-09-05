@@ -170,12 +170,12 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Country rules surfaced: wild camping legality, tolls, LEZ/ZFE
 
 ## Freemium & paywall
-- [ ] Free tier limits visible in-app (generations per month, locked layers)
-- [ ] Paywall: recurring subscription + one-off trip pass
+- [x] Free tier limits visible in-app (generations per month, locked layers)
+- [x] Paywall: recurring subscription + one-off trip pass
 - [ ] IAP via RevenueCat (StoreKit + Play Billing)
-- [ ] Restore purchases, entitlement sync, grace period, expiry
-- [ ] Upsell moments: after first generation, on locked POI layers
-- [ ] Manage subscription link + current plan screen
+- [x] Restore purchases, entitlement sync, grace period, expiry
+- [x] Upsell moments: after first generation, on locked POI layers
+- [x] Manage subscription link + current plan screen
 
 ## Notifications
 - [ ] Permission request with rationale, at the right moment (not on launch)

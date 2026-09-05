@@ -10,6 +10,8 @@ import { Slider } from "../../components/ui/Slider";
 import { Stepper } from "../../components/ui/Stepper";
 import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
+import { PaywallSheet } from "../paywall/PaywallSheet";
+import { useEntitlementsStore } from "../../store/entitlementsStore";
 import { useGenerationStore } from "../../store/generationStore";
 import { useTravelerProfileStore } from "../../store/travelerProfileStore";
 import { DestinationAutocomplete } from "../traveler/DestinationAutocomplete";
@@ -21,12 +23,20 @@ export default function GuidedScreen() {
   const { theme } = useTheme();
   const profile = useTravelerProfileStore((s) => s.profile);
   const start = useGenerationStore((s) => s.start);
+  const canGenerateQuota = useEntitlementsStore((s) => s.canGenerate);
+  const recordGeneration = useEntitlementsStore((s) => s.recordGeneration);
 
   const [destination, setDestination] = useState(profile.destination);
   const [nights, setNights] = useState(profile.nights);
   const [budgetEur, setBudgetEur] = useState(profile.budgetEur);
+  const [paywallOpen, setPaywallOpen] = useState(false);
 
   const generate = async () => {
+    if (!canGenerateQuota()) {
+      setPaywallOpen(true);
+      return;
+    }
+    recordGeneration();
     router.push("/generate/running" as any);
     await start("", destination, nights, budgetEur);
   };
@@ -62,6 +72,8 @@ export default function GuidedScreen() {
       <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
         <Button label="Générer mon voyage" icon="sparkles" onPress={generate} />
       </View>
+
+      <PaywallSheet visible={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </View>
   );
 }

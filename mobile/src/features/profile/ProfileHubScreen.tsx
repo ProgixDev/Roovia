@@ -11,6 +11,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { ParentalGate } from "../kids/ParentalGate";
 import { initialsFrom } from "../../lib/initials";
 import { useAuthStore } from "../../store/authStore";
+import { useEntitlementsStore } from "../../store/entitlementsStore";
 import { useKidsStore } from "../../store/kidsStore";
 
 /**
@@ -26,6 +27,7 @@ export default function ProfileHubScreen() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const enterKidsMode = useKidsStore((s) => s.enterKidsMode);
+  const entitlement = useEntitlementsStore((s) => s.entitlement);
   const [kidsGateOpen, setKidsGateOpen] = useState(false);
 
   const confirmLogout = () => {
@@ -84,6 +86,13 @@ export default function ProfileHubScreen() {
           <Text style={[typography.caption, { color: theme.colors.inkMuted }]}>Compte</Text>
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
             <ListRow icon="settings-outline" label="Compte" onPress={() => router.push("/account" as any)} />
+            <View style={[styles.divider, { backgroundColor: theme.colors.line }]} />
+            <ListRow
+              icon="sparkles-outline"
+              label="Mon abonnement"
+              value={entitlement.active ? "Premium" : "Gratuit"}
+              onPress={() => router.push("/plan" as any)}
+            />
           </View>
         </View>
 

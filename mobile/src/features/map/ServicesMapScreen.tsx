@@ -8,6 +8,7 @@ import { fits } from "../../lib/vehicleFit";
 import { PLACES } from "../../mocks/places";
 import { POIS, type Poi } from "../../mocks/pois";
 import type { Stop, StopKind } from "../../mocks/itineraries";
+import { PREMIUM_POI_KINDS, useEntitlementsStore } from "../../store/entitlementsStore";
 import { useItineraryStore } from "../../store/itineraryStore";
 import { usePoiStore } from "../../store/poiStore";
 import { useTripsStore } from "../../store/tripsStore";
@@ -36,6 +37,7 @@ export default function ServicesMapScreen() {
   const submittedPois = usePoiStore((s) => s.submitted);
   const submitPoi = usePoiStore((s) => s.submit);
   const activeVehicle = useVehiclesStore((s) => s.vehicles.find((v) => v.id === s.activeId)) ?? null;
+  const entitlementActive = useEntitlementsStore((s) => s.entitlement.active);
   const trips = useTripsStore((s) => s.trips);
   const itineraries = useItineraryStore((s) => s.itineraries);
   const addStop = useItineraryStore((s) => s.addStop);
@@ -48,6 +50,7 @@ export default function ServicesMapScreen() {
   const allPois = [...POIS, ...submittedPois];
   const filteredPois = allPois.filter((poi) => {
     if (!visibleKinds.includes(poi.kind)) return false;
+    if (!entitlementActive && (PREMIUM_POI_KINDS as readonly string[]).includes(poi.kind)) return false;
     if (filters.freeOnly && poi.priceEur !== null && poi.priceEur > 0) return false;
     if (filters.openNowOnly && !poi.openNow) return false;
     if (filters.minRating > 0 && poi.ratingOutOf5 < filters.minRating) return false;

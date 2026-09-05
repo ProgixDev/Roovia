@@ -14,7 +14,9 @@ import { RooviaMap } from "../map/RooviaMap";
 import { interpolateAlongRoute, scrubCoordinate } from "../map/useMapRegion";
 import type { MapPinData } from "../map/types";
 import { PublishSheet } from "../community/PublishSheet";
+import { PaywallSheet } from "../paywall/PaywallSheet";
 import { useAuthStore } from "../../store/authStore";
+import { useEntitlementsStore } from "../../store/entitlementsStore";
 import { useCommunityStore, type Visibility } from "../../store/communityStore";
 import { useGenerationStore } from "../../store/generationStore";
 import { useItineraryStore } from "../../store/itineraryStore";
@@ -68,6 +70,10 @@ export default function TripDetailScreen() {
   const setActiveVersion = useItineraryStore((s) => s.setActiveVersion);
   const applySuggestion = useItineraryStore((s) => s.applySuggestion);
   const refine = useGenerationStore((s) => s.refine);
+  const justGeneratedTripId = useGenerationStore((s) => s.resultTripId);
+  const entitlementActive = useEntitlementsStore((s) => s.entitlement.active);
+  const hasSeenPostGenerationUpsell = useEntitlementsStore((s) => s.hasSeenPostGenerationUpsell);
+  const markPostGenerationUpsellSeen = useEntitlementsStore((s) => s.markPostGenerationUpsellSeen);
 
   const suggestions = useSuggestionsStore((s) => s.byTrip[id] ?? []);
   const dismissedSuggestionIds = useSuggestionsStore((s) => s.dismissedIds[id] ?? []);
@@ -86,6 +92,7 @@ export default function TripDetailScreen() {
   const [refineOpen, setRefineOpen] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [upsellOpen, setUpsellOpen] = useState(false);
 
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -126,6 +133,16 @@ export default function TripDetailScreen() {
   useEffect(() => {
     if (progress >= 1) setPlaying(false);
   }, [progress]);
+
+  useEffect(() => {
+    if (trip && justGeneratedTripId === trip.id && !entitlementActive && !hasSeenPostGenerationUpsell) {
+      setUpsellOpen(true);
+      markPostGenerationUpsellSeen();
+    }
+    // Only re-check when the trip identity or the generation result changes —
+    // re-running on every entitlement/flag tick would fight the sheet's own open state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip?.id, justGeneratedTripId]);
 
   const goBack = () => {
     if (router.canGoBack()) router.back();
@@ -396,6 +413,7 @@ export default function TripDetailScreen() {
         }}
       />
       <PublishSheet visible={publishOpen} onClose={() => setPublishOpen(false)} onPublish={publishTrip} />
+      <PaywallSheet visible={upsellOpen} onClose={() => setUpsellOpen(false)} />
     </View>
   );
 }
