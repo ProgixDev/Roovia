@@ -22,9 +22,11 @@ import { useSuggestionsStore } from "../../store/suggestionsStore";
 import { useTripsStore } from "../../store/tripsStore";
 import { useVehiclesStore } from "../../store/vehiclesStore";
 import type { Stop } from "../../mocks/itineraries";
+import { rulesFor } from "../../mocks/countryRules";
 import { BudgetDashboard } from "./BudgetDashboard";
 import { BudgetSummary } from "./BudgetSummary";
 import { ChecklistSegment } from "./ChecklistSegment";
+import { CountryRulesCard } from "./CountryRulesCard";
 import { DayCard } from "./DayCard";
 import { DaySelector } from "./DaySelector";
 import { ExpensesSegment } from "./ExpensesSegment";
@@ -137,6 +139,8 @@ export default function TripDetailScreen() {
       </View>
     );
   }
+
+  const countryRules = rulesFor(trip.destination);
 
   const share = () => {
     Share.share({ message: `${trip.title} — ${trip.destination}, sur Roovia.` }).catch(() => {});
@@ -320,6 +324,8 @@ export default function TripDetailScreen() {
                 />
               </View>
             ) : null}
+
+            {countryRules ? <CountryRulesCard rules={countryRules} /> : null}
 
             <BudgetSummary days={activeVersion.days} totalBudgetEur={activeVersion.totalBudgetEur} />
 

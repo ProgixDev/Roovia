@@ -165,9 +165,9 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 
 ## International
 - [ ] FR / EN strings, date and number formatting
-- [ ] Metric ↔ imperial toggle
-- [ ] Currency selection
-- [ ] Country rules surfaced: wild camping legality, tolls, LEZ/ZFE
+- [x] Metric ↔ imperial toggle
+- [x] Currency selection
+- [x] Country rules surfaced: wild camping legality, tolls, LEZ/ZFE
 
 ## Freemium & paywall
 - [ ] Free tier limits visible in-app (generations per month, locked layers)
