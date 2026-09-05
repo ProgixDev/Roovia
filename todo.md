@@ -87,23 +87,23 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Push notification deep-linking into the suggestion
 
 ## Van / camping-car services map
-- [ ] POI layers with toggles + clustering:
-  - [ ] Fuel stations + price per liter
-  - [ ] Drinking water fill points
-  - [ ] Dump stations (vidange)
-  - [ ] Public toilets
-  - [ ] Aires de services camping-car
-  - [ ] Bivouac spots
-  - [ ] Paid campsites
-  - [ ] Parkings with height limit
-  - [ ] Local markets
-  - [ ] Points of interest / viewpoints
-- [ ] Filters: free / paid, open now, fits my vehicle height, min rating
-- [ ] "Around me now" sheet for mid-trip search
-- [ ] POI detail: photos, services, price, last-verified date, reviews
-- [ ] Add a POI to the trip → triggers recalculation
-- [ ] Report a POI (wrong / closed) + submit a new one
-- [ ] Save POI to favorites
+- [x] POI layers with toggles + clustering:
+  - [x] Fuel stations + price per liter
+  - [x] Drinking water fill points
+  - [x] Dump stations (vidange)
+  - [x] Public toilets
+  - [x] Aires de services camping-car
+  - [x] Bivouac spots
+  - [x] Paid campsites
+  - [x] Parkings with height limit
+  - [x] Local markets
+  - [x] Points of interest / viewpoints
+- [x] Filters: free / paid, open now, fits my vehicle height, min rating
+- [x] "Around me now" sheet for mid-trip search
+- [x] POI detail: photos, services, price, last-verified date, reviews
+- [x] Add a POI to the trip → triggers recalculation
+- [x] Report a POI (wrong / closed) + submit a new one
+- [x] Save POI to favorites
 
 ## Budget
 - [ ] Dashboard: estimated vs actual, per category, per day

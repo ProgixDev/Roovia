@@ -52,6 +52,18 @@ export const ICON_BY_KIND: Partial<Record<PoiKind, keyof typeof Ionicons.glyphMa
   parking: "car-outline",
 };
 
+export const POI_KIND_LABEL: Record<PoiKind, string> = {
+  fuel: "Carburant",
+  water: "Eau potable",
+  dumpStation: "Vidange",
+  toilets: "Toilettes",
+  bivouac: "Bivouac",
+  campsite: "Camping payant",
+  viewpoint: "Point de vue",
+  market: "Marché",
+  parking: "Parking",
+};
+
 export interface MapPinData {
   id: string;
   kind: PoiKind;
