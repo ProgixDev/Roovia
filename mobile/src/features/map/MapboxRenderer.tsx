@@ -23,18 +23,18 @@ if (PUBLIC_TOKEN) {
 const toPosition = (p: LatLng): [number, number] => [p.longitude, p.latitude];
 
 /** Same input contract as `SketchRenderer` — see `RooviaMap` for the switch between the two. */
-export function MapboxRenderer({ route, pins = [], activeId, onPressPin, interactive = true, style }: RooviaMapProps) {
+export function MapboxRenderer({ route, pins = [], activeId, onPressPin, liveMarker, interactive = true, style }: RooviaMapProps) {
   const { theme } = useTheme();
 
   const bounds = useMemo(() => {
-    const allPoints = [...(route?.coordinates ?? []), ...pins.map((p) => p.coordinate)];
+    const allPoints = [...(route?.coordinates ?? []), ...pins.map((p) => p.coordinate), ...(liveMarker ? [liveMarker] : [])];
     const b = computeBounds(allPoints);
     if (!b) return undefined;
     return {
       ne: toPosition({ latitude: b.maxLat, longitude: b.maxLng }),
       sw: toPosition({ latitude: b.minLat, longitude: b.minLng }),
     };
-  }, [route, pins]);
+  }, [route, pins, liveMarker]);
 
   const routeShape = useMemo(
     () =>
@@ -76,6 +76,14 @@ export function MapboxRenderer({ route, pins = [], activeId, onPressPin, interac
             </Pressable>
           </Mapbox.MarkerView>
         ))}
+
+        {liveMarker ? (
+          <Mapbox.MarkerView coordinate={toPosition(liveMarker)}>
+            <View style={[styles.liveMarkerRing, { borderColor: theme.colors.blaze }]}>
+              <View style={[styles.liveMarkerDot, { backgroundColor: theme.colors.blaze }]} />
+            </View>
+          </Mapbox.MarkerView>
+        ) : null}
       </Mapbox.MapView>
     </View>
   );
@@ -83,4 +91,13 @@ export function MapboxRenderer({ route, pins = [], activeId, onPressPin, interac
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  liveMarkerRing: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  liveMarkerDot: { width: 12, height: 12, borderRadius: 6 },
 });

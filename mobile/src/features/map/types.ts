@@ -69,6 +69,8 @@ export interface RooviaMapProps {
   pins?: MapPinData[];
   activeId?: string | null;
   onPressPin?: (id: string) => void;
+  /** A moving position, not a place — a live-trip marker (§4) or a group member's convoy position (§12). Rendered as a plain dot, never a category pin. */
+  liveMarker?: LatLng;
   /** Pan/pinch enabled. Off for small static previews (recap cards, thumbnails). */
   interactive?: boolean;
   style?: StyleProp<ViewStyle>;

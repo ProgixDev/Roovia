@@ -69,14 +69,14 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Generation history per trip (compare versions)
 
 ## Itinerary & map
-- [ ] Map with route polyline + numbered stops
-- [ ] Stop detail sheet: photos, description, hours, price, reviews, why it was picked
-- [ ] Day selector synced with map
-- [ ] List view alternative
-- [ ] Hand off to Google Maps / Waze / Apple Maps for actual driving
-- [ ] Live position + "next stop in X km / Y min"
-- [ ] Trip states: planned → in progress → finished
-- [ ] Offline access to the active trip + cached tiles along the corridor
+- [x] Map with route polyline + numbered stops
+- [x] Stop detail sheet: photos, description, hours, price, reviews, why it was picked
+- [x] Day selector synced with map
+- [x] List view alternative
+- [x] Hand off to Google Maps / Waze / Apple Maps for actual driving
+- [x] Live position + "next stop in X km / Y min"
+- [x] Trip states: planned → in progress → finished
+- [x] Offline access to the active trip + cached tiles along the corridor
 
 ## Dynamic re-routing
 - [ ] Suggestion cards ("rain in Nice tomorrow — swap the beach day?")

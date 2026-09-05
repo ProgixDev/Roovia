@@ -34,7 +34,7 @@ function ContourLines({ color }: { color: string }) {
 }
 
 /** Same input contract as `MapboxRenderer` — nothing above this decides which one is live, see `RooviaMap`. */
-export function SketchRenderer({ route, pins = [], activeId, onPressPin, interactive = true, style }: RooviaMapProps) {
+export function SketchRenderer({ route, pins = [], activeId, onPressPin, liveMarker, interactive = true, style }: RooviaMapProps) {
   const { theme } = useTheme();
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
 
@@ -50,9 +50,10 @@ export function SketchRenderer({ route, pins = [], activeId, onPressPin, interac
     setViewport({ width, height });
   }, []);
 
-  const allPoints = [...(route?.coordinates ?? []), ...pins.map((p) => p.coordinate)];
+  const allPoints = [...(route?.coordinates ?? []), ...pins.map((p) => p.coordinate), ...(liveMarker ? [liveMarker] : [])];
   const project = createProjector(allPoints, CANVAS, PADDING);
   const routePoints: Point[] = route ? route.coordinates.map(project) : [];
+  const liveMarkerAt = liveMarker ? project(liveMarker) : null;
 
   // Cluster pins that land within CLUSTER_DISTANCE canvas units of each other.
   const projectedPins = pins.map((pin) => ({ pin, at: project(pin.coordinate) }));
@@ -128,6 +129,17 @@ export function SketchRenderer({ route, pins = [], activeId, onPressPin, interac
               </Pressable>
             ),
           )}
+
+          {liveMarkerAt ? (
+            <View
+              style={[
+                styles.liveMarkerRing,
+                { left: liveMarkerAt.x - 14, top: liveMarkerAt.y - 14, borderColor: theme.colors.blaze },
+              ]}
+            >
+              <View style={[styles.liveMarkerDot, { backgroundColor: theme.colors.blaze }]} />
+            </View>
+          ) : null}
         </Animated.View>
       </GestureDetector>
     </View>
@@ -137,4 +149,14 @@ export function SketchRenderer({ route, pins = [], activeId, onPressPin, interac
 const styles = StyleSheet.create({
   viewport: { flex: 1, overflow: "hidden" },
   canvas: { width: CANVAS, height: CANVAS, position: "absolute", left: 0, top: 0 },
+  liveMarkerRing: {
+    position: "absolute",
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  liveMarkerDot: { width: 12, height: 12, borderRadius: 6 },
 });

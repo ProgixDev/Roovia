@@ -201,6 +201,10 @@ interface TripsState {
   remove(id: string): void;
   /** The one entry point AI generation (§3) uses to land a result on Home — returns the new trip's id. */
   addGenerated(input: { title: string; destination: string; dateRange: string | null; distanceKm: number; budgetEur: number }): string;
+  /** upcoming/draft → in_progress. `totalDays` seeds day-progress at day 1. */
+  startTrip(id: string, totalDays: number): void;
+  /** in_progress → past. */
+  finishTrip(id: string): void;
 }
 
 export const useTripsStore = create<TripsState>((set, get) => ({
@@ -253,5 +257,19 @@ export const useTripsStore = create<TripsState>((set, get) => ({
     };
     set({ trips: [trip, ...get().trips] });
     return id;
+  },
+
+  startTrip(id, totalDays) {
+    set({
+      trips: get().trips.map((t) =>
+        t.id === id ? { ...t, status: "in_progress", dayProgress: { current: 1, total: totalDays } } : t,
+      ),
+    });
+  },
+
+  finishTrip(id) {
+    set({
+      trips: get().trips.map((t) => (t.id === id ? { ...t, status: "past", dayProgress: null } : t)),
+    });
   },
 }));

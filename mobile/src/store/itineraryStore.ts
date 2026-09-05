@@ -19,6 +19,7 @@ export interface Itinerary {
   /** Stop ids that survive a refine/regenerate — checked by the mocked
    * generator before it swaps anything out. */
   lockedStopIds: string[];
+  favoriteStopIds: string[];
 }
 
 interface ItineraryState {
@@ -27,6 +28,7 @@ interface ItineraryState {
   addVersion(tripId: string, result: GeneratedItinerary, label: string): void;
   setActiveVersion(tripId: string, versionId: string): void;
   toggleLock(tripId: string, stopId: string): void;
+  toggleFavorite(tripId: string, stopId: string): void;
   moveStop(tripId: string, dayId: string, stopId: string, direction: "up" | "down"): void;
   removeStop(tripId: string, dayId: string, stopId: string): void;
   addStop(tripId: string, dayId: string, stop: Stop): void;
@@ -65,6 +67,7 @@ export const useItineraryStore = create<ItineraryState>((set, get) => ({
       versions: [version],
       activeVersionId: version.id,
       lockedStopIds: [],
+      favoriteStopIds: [],
     };
     set({ itineraries: { ...get().itineraries, [tripId]: itinerary } });
   },
@@ -94,6 +97,15 @@ export const useItineraryStore = create<ItineraryState>((set, get) => ({
       ? current.lockedStopIds.filter((id) => id !== stopId)
       : [...current.lockedStopIds, stopId];
     set({ itineraries: { ...get().itineraries, [tripId]: { ...current, lockedStopIds } } });
+  },
+
+  toggleFavorite(tripId, stopId) {
+    const current = get().itineraries[tripId];
+    if (!current) return;
+    const favoriteStopIds = current.favoriteStopIds.includes(stopId)
+      ? current.favoriteStopIds.filter((id) => id !== stopId)
+      : [...current.favoriteStopIds, stopId];
+    set({ itineraries: { ...get().itineraries, [tripId]: { ...current, favoriteStopIds } } });
   },
 
   moveStop(tripId, dayId, stopId, direction) {

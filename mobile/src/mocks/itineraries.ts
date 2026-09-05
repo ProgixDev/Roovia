@@ -10,6 +10,12 @@ export interface Stop {
   coordinate: LatLng;
   driveTimeMinFromPrev: number | null;
   priceEur: number | null;
+  /** Minutes added versus the direct route to reach this stop — omitted for a stop that's simply along the way. */
+  detourMinutes?: number;
+  ratingOutOf5?: number;
+  hours?: string;
+  /** A clearance this specific stop won't take — checked against the active vehicle by `lib/vehicleFit`. Omitted for almost every stop; this is deliberately rare. */
+  maxHeightM?: number;
 }
 
 export interface TripDay {
@@ -49,14 +55,14 @@ export const BASE_ITINERARIES: GeneratedItinerary[] = [
         stops: [
           { id: nextId("stop"), name: "Départ — Biarritz", kind: "visit", description: "Dernier plein avant la frontière, vue sur la Grande Plage.", coordinate: { latitude: 43.4832, longitude: -1.5586 }, driveTimeMinFromPrev: null, priceEur: null },
           { id: nextId("stop"), name: "Saint-Sébastien", kind: "visit", description: "La Concha et les pintxos de la vieille ville.", coordinate: { latitude: 43.3183, longitude: -1.9812 }, driveTimeMinFromPrev: 55, priceEur: null },
-          { id: nextId("stop"), name: "Aire de Zarautz", kind: "sleep_paid", description: "Aire de services face à la plage, bornes eau/vidange.", coordinate: { latitude: 43.2833, longitude: -2.1706 }, driveTimeMinFromPrev: 25, priceEur: 14 },
+          { id: nextId("stop"), name: "Aire de Zarautz", kind: "sleep_paid", description: "Aire de services face à la plage, bornes eau/vidange.", coordinate: { latitude: 43.2833, longitude: -2.1706 }, driveTimeMinFromPrev: 25, priceEur: 14, ratingOutOf5: 4.2, hours: "24h/24" },
         ],
       },
       {
         id: nextId("day"),
         index: 2,
         stops: [
-          { id: nextId("stop"), name: "Bilbao — Guggenheim", kind: "visit", description: "Musée et balade le long du Nervión.", coordinate: { latitude: 43.2687, longitude: -2.9337 }, driveTimeMinFromPrev: 70, priceEur: 16 },
+          { id: nextId("stop"), name: "Bilbao — Guggenheim", kind: "visit", description: "Musée et balade le long du Nervión.", coordinate: { latitude: 43.2687, longitude: -2.9337 }, driveTimeMinFromPrev: 70, priceEur: 16, detourMinutes: 25, ratingOutOf5: 4.6, hours: "10h–19h", maxHeightM: 2.1 },
           { id: nextId("stop"), name: "Station Repsol A-8", kind: "service", description: "Carburant + point d'eau potable.", coordinate: { latitude: 43.35, longitude: -3.6 }, driveTimeMinFromPrev: 90, priceEur: null },
           { id: nextId("stop"), name: "Bivouac Costa Verde", kind: "sleep_free", description: "Spot gratuit toléré, vue sur la côte.", coordinate: { latitude: 43.4, longitude: -4.2 }, driveTimeMinFromPrev: 40, priceEur: null },
         ],

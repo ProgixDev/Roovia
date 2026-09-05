@@ -59,3 +59,23 @@ export function createProjector(points: LatLng[], size: number, padding: number)
 export function useProjector(points: LatLng[], size: number, padding: number) {
   return useMemo(() => createProjector(points, size, padding), [points, size, padding]);
 }
+
+/**
+ * Index-based, not path-length-weighted — a live-position demo doesn't need
+ * true constant-speed motion along the route, just a point that visibly
+ * advances stop by stop. `t` is clamped to [0, 1].
+ */
+export function interpolateAlongRoute(coordinates: LatLng[], t: number): LatLng | null {
+  if (coordinates.length === 0) return null;
+  if (coordinates.length === 1) return coordinates[0];
+  const clamped = Math.min(1, Math.max(0, t));
+  const scaled = clamped * (coordinates.length - 1);
+  const i = Math.floor(scaled);
+  const frac = scaled - i;
+  const a = coordinates[i];
+  const b = coordinates[Math.min(i + 1, coordinates.length - 1)];
+  return {
+    latitude: a.latitude + (b.latitude - a.latitude) * frac,
+    longitude: a.longitude + (b.longitude - a.longitude) * frac,
+  };
+}
