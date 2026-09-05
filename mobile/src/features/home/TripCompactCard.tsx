@@ -9,6 +9,7 @@ import type { Trip, TripStatus } from "../../store/tripsStore";
 
 interface TripCompactCardProps {
   trip: Trip;
+  onPress: () => void;
   onPressMore: () => void;
 }
 
@@ -24,12 +25,14 @@ const READY_STATUS: Partial<Record<TripStatus, { label: string; icon: keyof type
  * everything else stacked below. Deliberately smaller/quieter than the
  * hero treatment: this is a list you scan, not a dashboard you glance at.
  */
-export function TripCompactCard({ trip, onPressMore }: TripCompactCardProps) {
+export function TripCompactCard({ trip, onPress, onPressMore }: TripCompactCardProps) {
   const { theme } = useTheme();
   const ready = READY_STATUS[trip.status];
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
+    <Pressable
+      onPress={onPress}
+      style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
       <View style={styles.coverWrap}>
         <Image
           source={trip.cover}
@@ -91,7 +94,7 @@ export function TripCompactCard({ trip, onPressMore }: TripCompactCardProps) {
           ) : null}
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

@@ -56,17 +56,17 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [ ] Incompatibility banner when a route or spot doesn't fit the vehicle
 
 ## AI trip generation
-- [ ] Natural-language prompt screen ("3 weeks in Spain, via Valencia, budget 2000 €")
-- [ ] Guided form fallback for users who won't type
-- [ ] Prefill from traveler + vehicle profile, chips editable before sending
-- [ ] Streaming UI: steps appear progressively, skeleton, cancel button
-- [ ] States: pending / partial / done / failed + retry
-- [ ] Result: day-by-day timeline — route, stops, places to visit, activities, sleep spots (free and paid), drive time, detours, services on the way
-- [ ] Budget estimate block on the result
-- [ ] Refine ("more hiking", "cheaper", "less driving") without losing manual edits
+- [x] Natural-language prompt screen ("3 weeks in Spain, via Valencia, budget 2000 €")
+- [x] Guided form fallback for users who won't type
+- [x] Prefill from traveler + vehicle profile, chips editable before sending
+- [x] Streaming UI: steps appear progressively, skeleton, cancel button
+- [x] States: pending / partial / done / failed + retry
+- [x] Result: day-by-day timeline — route, stops, places to visit, activities, sleep spots (free and paid), drive time, detours, services on the way
+- [x] Budget estimate block on the result
+- [x] Refine ("more hiking", "cheaper", "less driving") without losing manual edits
 - [ ] Manual edit: reorder, add/remove stop, lock a stop, shift dates
-- [ ] Save / duplicate / delete trip
-- [ ] Generation history per trip (compare versions)
+- [x] Save / duplicate / delete trip
+- [x] Generation history per trip (compare versions)
 
 ## Itinerary & map
 - [ ] Map with route polyline + numbered stops

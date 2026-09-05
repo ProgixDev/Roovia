@@ -9,6 +9,7 @@ import type { Trip } from "../../store/tripsStore";
 
 interface TripHeroCardProps {
   trip: Trip;
+  onPress: () => void;
   onPressMore: () => void;
 }
 
@@ -18,7 +19,7 @@ interface TripHeroCardProps {
  * cover left, detail right) on purpose: it reads as a dashboard tile you
  * glance at, not a list row you scroll past like the compact cards below.
  */
-export function TripHeroCard({ trip, onPressMore }: TripHeroCardProps) {
+export function TripHeroCard({ trip, onPress, onPressMore }: TripHeroCardProps) {
   const { theme } = useTheme();
 
   const share = () => {
@@ -28,7 +29,9 @@ export function TripHeroCard({ trip, onPressMore }: TripHeroCardProps) {
   };
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
+    <Pressable
+      onPress={onPress}
+      style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
       <View style={styles.coverWrap}>
         <Image
           source={trip.cover}
@@ -107,7 +110,7 @@ export function TripHeroCard({ trip, onPressMore }: TripHeroCardProps) {
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

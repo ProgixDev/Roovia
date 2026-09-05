@@ -142,7 +142,7 @@ export default function HomeScreen() {
                 </Text>
                 <View style={styles.cardStack}>
                   {inProgress.map((trip) => (
-                    <TripHeroCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                    <TripHeroCard key={trip.id} trip={trip} onPress={() => router.push(`/trip/${trip.id}` as any)} onPressMore={() => setMenuTripId(trip.id)} />
                   ))}
                 </View>
               </View>
@@ -155,7 +155,7 @@ export default function HomeScreen() {
                 </Text>
                 <View style={styles.cardStack}>
                   {upcoming.map((trip) => (
-                    <TripCompactCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                    <TripCompactCard key={trip.id} trip={trip} onPress={() => router.push(`/trip/${trip.id}` as any)} onPressMore={() => setMenuTripId(trip.id)} />
                   ))}
                 </View>
               </View>
@@ -174,7 +174,7 @@ export default function HomeScreen() {
               ) : (
                 <View style={styles.cardStack}>
                   {past.map((trip) => (
-                    <TripCompactCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                    <TripCompactCard key={trip.id} trip={trip} onPress={() => router.push(`/trip/${trip.id}` as any)} onPressMore={() => setMenuTripId(trip.id)} />
                   ))}
                 </View>
               ))}
@@ -192,7 +192,7 @@ export default function HomeScreen() {
               ) : (
                 <View style={styles.cardStack}>
                   {drafts.map((trip) => (
-                    <TripCompactCard key={trip.id} trip={trip} onPressMore={() => setMenuTripId(trip.id)} />
+                    <TripCompactCard key={trip.id} trip={trip} onPress={() => router.push(`/trip/${trip.id}` as any)} onPressMore={() => setMenuTripId(trip.id)} />
                   ))}
                 </View>
               ))}

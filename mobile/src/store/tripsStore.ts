@@ -199,6 +199,8 @@ interface TripsState {
   duplicate(id: string): void;
   archive(id: string): void;
   remove(id: string): void;
+  /** The one entry point AI generation (§3) uses to land a result on Home — returns the new trip's id. */
+  addGenerated(input: { title: string; destination: string; dateRange: string | null; distanceKm: number; budgetEur: number }): string;
 }
 
 export const useTripsStore = create<TripsState>((set, get) => ({
@@ -233,5 +235,23 @@ export const useTripsStore = create<TripsState>((set, get) => ({
 
   remove(id) {
     set({ trips: get().trips.filter((t) => t.id !== id) });
+  },
+
+  addGenerated(input) {
+    const id = `trip_${Date.now()}`;
+    const trip: Trip = {
+      id,
+      title: input.title,
+      destination: input.destination,
+      cover: FILLER_COVERS[get().trips.length % FILLER_COVERS.length],
+      dateRange: input.dateRange,
+      distanceKm: input.distanceKm,
+      budgetEur: input.budgetEur,
+      status: "upcoming",
+      archived: false,
+      dayProgress: null,
+    };
+    set({ trips: [trip, ...get().trips] });
+    return id;
   },
 }));
