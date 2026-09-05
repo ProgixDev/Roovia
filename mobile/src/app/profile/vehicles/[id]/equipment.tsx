@@ -1,30 +1,19 @@
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../../../components/ui/Button";
 import { Chip } from "../../../../components/ui/Chip";
-import { FieldGroup } from "../../../../components/ui/FieldGroup";
-import { Switch } from "../../../../components/ui/Switch";
-import { radius } from "../../../../constants/themes";
 import { typography } from "../../../../constants/typography";
 import { useTheme } from "../../../../contexts/ThemeContext";
-import { TOILET_LABEL } from "../../../../features/vehicle/labels";
-import { vehicleStepInfo } from "../../../../features/vehicle/steps";
-import { WizardShell } from "../../../../features/wizard/WizardShell";
+import { IconToggleCard } from "../../../../features/vehicle/IconToggleCard";
+import { PhaseWizardShell } from "../../../../features/wizard/PhaseWizardShell";
 import { type ToiletType, type VehicleEquipment, useVehiclesStore } from "../../../../store/vehiclesStore";
 
-const TOILET_TYPES: ToiletType[] = ["cassette", "fixed", "none"];
+const VEHICLE_STEPS = ["Basique", "Équipement", "Autonomie", "Prêt"];
 
-const EQUIPMENT_ROWS: { key: keyof VehicleEquipment; label: string }[] = [
-  { key: "shower", label: "Douche" },
-  { key: "freshWaterTank", label: "Réservoir d'eau propre" },
-  { key: "greyTank", label: "Eaux grises" },
-  { key: "blackTank", label: "Eaux noires" },
-  { key: "solar", label: "Panneau solaire" },
-  { key: "fridge", label: "Frigo" },
-];
-
+/** Phase 2/4 — same fields as the old "equipment" step, now with icon cards instead of plain switch rows. */
 export default function VehicleEquipmentStep() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -44,59 +33,114 @@ export default function VehicleEquipmentStep() {
     },
   );
 
-  const { step, stepCount, nextRoute, backRoute } = vehicleStepInfo(id, "equipment");
-
   const goBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace((backRoute ?? "/profile/vehicles") as any);
+    else router.replace("/profile/vehicles" as any);
   };
 
   const next = async () => {
     await updateVehicle(id, { toiletType, equipment });
-    router.push((nextRoute ?? `/profile/vehicles/${id}/autonomy`) as any);
+    router.push(`/profile/vehicles/${id}/autonomy` as any);
   };
+
+  const toggleEquipment = (key: keyof VehicleEquipment) =>
+    setEquipment((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const hasToilet = toiletType !== "none";
+  const toggleToilet = () => setToiletType(hasToilet ? "none" : "cassette");
 
   if (!vehicle) return null;
 
   return (
-    <WizardShell
-      step={step}
-      stepCount={stepCount}
-      title="Équipements"
-      subtitle="La carte des services (POI) filtrera selon ce qui est déjà à bord."
+    <PhaseWizardShell
+      step={1}
+      stepLabels={VEHICLE_STEPS}
+      headerTitle="Profil véhicule"
+      exitRoute="/profile/vehicles"
+      title="Qu'y a-t-il à bord ?"
+      subtitle="On trouvera les bonnes étapes en cours de route."
       onBack={goBack}
       footer={<Button label="Continuer" onPress={next} />}
     >
-      <FieldGroup label="Toilettes">
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          {TOILET_TYPES.map((t) => (
-            <Chip key={t} label={TOILET_LABEL[t]} selected={toiletType === t} onPress={() => setToiletType(t)} />
-          ))}
+      <View style={{ gap: 14 }}>
+        <SectionHeader icon={<Ionicons name="leaf-outline" size={16} color={theme.colors.moss} />} label="Confort" />
+        <View style={styles.grid}>
+          <IconToggleCard
+            icon={<MaterialCommunityIcons name="toilet" size={26} color={theme.colors.ink} />}
+            label="Toilettes"
+            selected={hasToilet}
+            onPress={toggleToilet}
+          />
+          <IconToggleCard
+            icon={<MaterialCommunityIcons name="shower" size={26} color={theme.colors.ink} />}
+            label="Douche"
+            selected={equipment.shower}
+            onPress={() => toggleEquipment("shower")}
+          />
+          <IconToggleCard
+            icon={<MaterialCommunityIcons name="fridge-outline" size={26} color={theme.colors.ink} />}
+            label="Frigo"
+            selected={equipment.fridge}
+            onPress={() => toggleEquipment("fridge")}
+          />
+          <IconToggleCard
+            icon={<MaterialCommunityIcons name="solar-power" size={26} color={theme.colors.ink} />}
+            label="Solaire"
+            selected={equipment.solar}
+            onPress={() => toggleEquipment("solar")}
+          />
         </View>
-      </FieldGroup>
 
-      <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.line }]}>
-        {EQUIPMENT_ROWS.map((row, i) => (
-          <View key={row.key}>
-            <View style={styles.row}>
-              <Text style={[typography.button, { color: theme.colors.ink, flex: 1 }]}>{row.label}</Text>
-              <Switch
-                value={equipment[row.key]}
-                onChange={(value) => setEquipment((prev) => ({ ...prev, [row.key]: value }))}
-              />
-            </View>
-            {i < EQUIPMENT_ROWS.length - 1 ? (
-              <View style={[styles.divider, { backgroundColor: theme.colors.line }]} />
-            ) : null}
+        {hasToilet ? (
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Chip label="Cassette" selected={toiletType === "cassette"} onPress={() => setToiletType("cassette")} />
+            <Chip label="Fixe" selected={toiletType === "fixed"} onPress={() => setToiletType("fixed")} />
           </View>
-        ))}
+        ) : null}
       </View>
-    </WizardShell>
+
+      <View style={{ gap: 14 }}>
+        <SectionHeader icon={<Ionicons name="water-outline" size={16} color={theme.colors.moss} />} label="Eau & réservoirs" />
+        <View style={styles.grid}>
+          <IconToggleCard
+            icon={<Ionicons name="water-outline" size={26} color={theme.colors.ink} />}
+            label="Eau propre"
+            selected={equipment.freshWaterTank}
+            onPress={() => toggleEquipment("freshWaterTank")}
+          />
+          <IconToggleCard
+            icon={<Ionicons name="water-outline" size={26} color={theme.colors.ink} />}
+            label="Eaux grises"
+            selected={equipment.greyTank}
+            onPress={() => toggleEquipment("greyTank")}
+          />
+          <IconToggleCard
+            icon={<Ionicons name="water-outline" size={26} color={theme.colors.ink} />}
+            label="Eaux noires"
+            selected={equipment.blackTank}
+            onPress={() => toggleEquipment("blackTank")}
+          />
+        </View>
+      </View>
+    </PhaseWizardShell>
+  );
+}
+
+function SectionHeader({ icon, label }: { icon: ReactNode; label: string }) {
+  const { theme } = useTheme();
+  return (
+    <View style={styles.sectionHeader}>
+      {icon}
+      <Text style={[typography.sectionHead, { color: theme.colors.ink, fontSize: 20, lineHeight: 22, textTransform: "uppercase" }]}>
+        {label}
+      </Text>
+      <View style={[styles.sectionRule, { backgroundColor: theme.colors.line }]} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: radius.md, borderWidth: 1, paddingHorizontal: 14 },
-  row: { flexDirection: "row", alignItems: "center", height: 56 },
-  divider: { height: StyleSheet.hairlineWidth },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  sectionRule: { flex: 1, height: StyleSheet.hairlineWidth },
 });

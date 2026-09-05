@@ -8,9 +8,17 @@ import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { PhaseStepper } from "./PhaseStepper";
 
-interface TravelerWizardShellProps {
-  /** 0-indexed — which of the 4 phases this screen is. */
-  step: 0 | 1 | 2 | 3;
+interface PhaseWizardShellProps {
+  /** 0-indexed — which phase this screen is. Length of `stepLabels` sets the node count. */
+  step: number;
+  stepLabels: string[];
+  /** The fixed header title next to the logo — "Profil voyageur", "Profil véhicule". */
+  headerTitle: string;
+  /** Where both "Enregistrer" and "Je compléterai plus tard" exit to. Data
+   * is already auto-persisted on every field change (same across every
+   * screen using this shell), so both are just an explicit way out, not a
+   * save action of their own. */
+  exitRoute: string;
   title: string;
   subtitle?: string;
   onBack?: () => void;
@@ -19,23 +27,31 @@ interface TravelerWizardShellProps {
 }
 
 /**
- * Shell for the 4-phase traveler profile wizard (Qui/Où/Style/Bilan) only —
- * deliberately NOT a restyle of the shared `WizardShell`, which the
- * vehicle-profile wizard also uses and which this redesign doesn't touch.
- * Branded header (logo + title + "Enregistrer") and the numbered
- * `PhaseStepper` replace `WizardShell`'s bare back-chevron + dot row; the
- * scroll body / fixed footer dock structure is otherwise the same shape.
+ * Shared shell for both 4-phase wizards (traveler: Qui/Où/Style/Bilan, and
+ * vehicle: Basique/Équipement/Autonomie/Prêt) — a branded header (logo +
+ * `headerTitle` + "Enregistrer") and the numbered `PhaseStepper`, replacing
+ * the old vehicle-only `WizardShell`'s bare back-chevron + dot row (now
+ * unused). One component parameterized by props rather than two
+ * near-identical copies, since the two wizards differ only in their step
+ * labels, header title, and exit route — everything else (scroll body,
+ * fixed footer dock, "later" link) is identical.
  */
-export function TravelerWizardShell({ step, title, subtitle, onBack, children, footer }: TravelerWizardShellProps) {
+export function PhaseWizardShell({
+  step,
+  stepLabels,
+  headerTitle,
+  exitRoute,
+  title,
+  subtitle,
+  onBack,
+  children,
+  footer,
+}: PhaseWizardShellProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
 
-  // Data is already auto-persisted on every field change (same as every
-  // other screen in this wizard) — "Enregistrer" just gives the user an
-  // explicit exit point back to the tab it was reached from.
-  const saveDraft = () => router.replace("/(tabs)/profil" as any);
-  const addThisLater = () => router.replace("/(tabs)/profil" as any);
+  const exit = () => router.replace(exitRoute as any);
 
   return (
     <KeyboardAvoidingView
@@ -56,17 +72,17 @@ export function TravelerWizardShell({ step, title, subtitle, onBack, children, f
             ) : null}
             <Image source={theme.logo} style={styles.logo} resizeMode="contain" />
             <Text style={[typography.cardTitle, { color: theme.colors.ink, fontSize: 22, lineHeight: 26 }]}>
-              Profil voyageur
+              {headerTitle}
             </Text>
           </View>
-          <Pressable onPress={saveDraft} hitSlop={10} style={styles.saveDraft}>
+          <Pressable onPress={exit} hitSlop={10} style={styles.saveDraft}>
             <Ionicons name="bookmark-outline" size={16} color={theme.colors.inkMuted} />
             <Text style={[typography.button, { color: theme.colors.inkMuted, fontSize: 13 }]}>Enregistrer</Text>
           </Pressable>
         </View>
 
         <View style={styles.stepper}>
-          <PhaseStepper step={step} />
+          <PhaseStepper step={step} labels={stepLabels} />
         </View>
 
         <Text style={[typography.sectionHead, styles.title, { color: theme.colors.ink }]}>{title}</Text>
@@ -79,7 +95,7 @@ export function TravelerWizardShell({ step, title, subtitle, onBack, children, f
 
       <View style={[styles.dock, { backgroundColor: theme.colors.ground, paddingBottom: insets.bottom + 16 }]}>
         {footer}
-        <Pressable onPress={addThisLater} hitSlop={10} style={styles.later}>
+        <Pressable onPress={exit} hitSlop={10} style={styles.later}>
           <Text style={[typography.body, { color: theme.colors.inkMuted, textDecorationLine: "underline" }]}>
             Je compléterai plus tard
           </Text>
@@ -97,7 +113,7 @@ const styles = StyleSheet.create({
   back: { marginRight: 2 },
   logo: { width: 36, height: 36 },
   saveDraft: { flexDirection: "row", alignItems: "center", gap: 6, height: 32 },
-  stepper: { marginTop: 28, alignSelf: "center", width: "80%" },
+  stepper: { marginTop: 28, alignSelf: "center", width: "90%" },
   title: { marginTop: 28, textTransform: "uppercase" },
   form: { marginTop: 28, gap: 24 },
   dock: { paddingHorizontal: 24, paddingTop: 14, gap: 12 },

@@ -8,13 +8,15 @@ import { typography } from "../../../constants/typography";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { ChildrenPanel } from "../../../features/traveler/ChildrenPanel";
 import { PartyPicker } from "../../../features/traveler/PartyPicker";
-import { TravelerWizardShell } from "../../../features/traveler/TravelerWizardShell";
+import { PhaseWizardShell } from "../../../features/wizard/PhaseWizardShell";
 import {
   type ChildProfile,
   type Interest,
   type PartyComposition,
   useTravelerProfileStore,
 } from "../../../store/travelerProfileStore";
+
+const TRAVELER_STEPS = ["Qui", "Où", "Style", "Bilan"];
 
 const INTEREST_OPTIONS: { value: Interest; label: string; icon: ChipProps["icon"] }[] = [
   { value: "beach", label: "Plage", icon: "water-outline" },
@@ -49,8 +51,11 @@ export default function TravelerWhoStep() {
   };
 
   return (
-    <TravelerWizardShell
+    <PhaseWizardShell
       step={0}
+      stepLabels={TRAVELER_STEPS}
+      headerTitle="Profil voyageur"
+      exitRoute="/(tabs)/profil"
       title="Qui vient avec vous ?"
       subtitle="On adapte l'itinéraire à votre équipage."
       footer={<Button label="Continuer" onPress={next} disabled={!party} />}
@@ -77,6 +82,6 @@ export default function TravelerWhoStep() {
           ))}
         </View>
       </View>
-    </TravelerWizardShell>
+    </PhaseWizardShell>
   );
 }

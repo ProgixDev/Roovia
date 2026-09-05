@@ -11,7 +11,7 @@ import { typography } from "../../../constants/typography";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { DestinationAutocomplete } from "../../../features/traveler/DestinationAutocomplete";
 import { DestinationSearchField } from "../../../features/traveler/DestinationSearchField";
-import { TravelerWizardShell } from "../../../features/traveler/TravelerWizardShell";
+import { PhaseWizardShell } from "../../../features/wizard/PhaseWizardShell";
 import { formatDate, formatDateRange, formatMonthYear } from "../../../lib/format";
 import { type DatedConstraint, useTravelerProfileStore } from "../../../store/travelerProfileStore";
 
@@ -29,6 +29,8 @@ function toISODate(date: Date): string {
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
+
+const TRAVELER_STEPS = ["Qui", "Où", "Style", "Bilan"];
 
 /** Phase 2/4 — destination, dates, and fixed stops (moved here from the old "preferences" step — a stop is where-shaped, not style-shaped). */
 export default function TravelerWhereStep() {
@@ -76,8 +78,11 @@ export default function TravelerWhereStep() {
       : "Mois flexible";
 
   return (
-    <TravelerWizardShell
+    <PhaseWizardShell
       step={1}
+      stepLabels={TRAVELER_STEPS}
+      headerTitle="Profil voyageur"
+      exitRoute="/(tabs)/profil"
       title="Où et quand ?"
       subtitle="Une destination précise ou une simple envie — les deux fonctionnent."
       onBack={goBack}
@@ -185,7 +190,7 @@ export default function TravelerWhereStep() {
           </View>
         ) : null}
       </FieldGroup>
-    </TravelerWizardShell>
+    </PhaseWizardShell>
   );
 }
 

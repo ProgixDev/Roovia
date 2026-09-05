@@ -9,7 +9,7 @@ import { radius } from "../../../constants/themes";
 import { typography } from "../../../constants/typography";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { PreferenceSlider } from "../../../features/traveler/PreferenceSlider";
-import { TravelerWizardShell } from "../../../features/traveler/TravelerWizardShell";
+import { PhaseWizardShell } from "../../../features/wizard/PhaseWizardShell";
 import { useTravelerProfileStore } from "../../../store/travelerProfileStore";
 
 const PACE_OPTIONS: { value: number; label: string }[] = [
@@ -17,6 +17,8 @@ const PACE_OPTIONS: { value: number; label: string }[] = [
   { value: 0.5, label: "Équilibré" },
   { value: 1, label: "Intense" },
 ];
+
+const TRAVELER_STEPS = ["Qui", "Où", "Style", "Bilan"];
 
 /** Phase 3/4 — budget + nights folded in with pace, driving, ambiance, and sleep type. */
 export default function TravelerStyleStep() {
@@ -44,8 +46,11 @@ export default function TravelerStyleStep() {
   };
 
   return (
-    <TravelerWizardShell
+    <PhaseWizardShell
       step={2}
+      stepLabels={TRAVELER_STEPS}
+      headerTitle="Profil voyageur"
+      exitRoute="/(tabs)/profil"
       title="Voyagez à votre façon"
       subtitle="Dites-nous à quoi ressemble une bonne journée."
       onBack={goBack}
@@ -89,7 +94,7 @@ export default function TravelerStyleStep() {
           />
         </View>
       </StyleRow>
-    </TravelerWizardShell>
+    </PhaseWizardShell>
   );
 }
 

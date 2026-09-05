@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { radius } from "../../constants/themes";
@@ -7,7 +8,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { formatLength, formatWeight, type UnitSystem } from "../../lib/format";
 import type { Vehicle } from "../../store/vehiclesStore";
 import { VEHICLE_TYPE_LABEL } from "./labels";
-import { VehicleSilhouette } from "./VehicleSilhouette";
+import { VEHICLE_SCENE } from "./vehicleScenes";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -36,9 +37,7 @@ export function VehicleCard({ vehicle, active, units, onPress, onPressMore }: Ve
         },
       ]}
     >
-      <View style={[styles.thumb, { backgroundColor: theme.colors.surfaceSunken }]}>
-        <VehicleSilhouette type={vehicle.type} heightM={vehicle.heightM} lengthM={vehicle.lengthM} weightKg={vehicle.weightKg} unit={units} compact />
-      </View>
+      <Image source={VEHICLE_SCENE[vehicle.type]} style={[styles.thumb, { backgroundColor: theme.colors.surface }]} contentFit="contain" />
 
       <View style={styles.body}>
         <View style={styles.titleRow}>
@@ -78,7 +77,7 @@ export function VehicleCard({ vehicle, active, units, onPress, onPressMore }: Ve
 
 const styles = StyleSheet.create({
   card: { flexDirection: "row", borderRadius: radius.lg, borderWidth: 1, overflow: "hidden" },
-  thumb: { width: "36%", alignItems: "center", justifyContent: "center" },
+  thumb: { width: "36%" },
   body: { flex: 1, padding: 14, gap: 4 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   statsRow: { flexDirection: "row", gap: 12, marginTop: 8 },
