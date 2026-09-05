@@ -113,20 +113,20 @@ Road trip planner for van / camping-car with AI itineraries. Park4night + Polars
 - [x] Multi-currency
 
 ## Shared expenses (Tricount)
-- [ ] Create group + invite by link or code
-- [ ] Add expense: amount, payer, category, split (equal / shares / exact), receipt photo
-- [ ] Expense list + filters
-- [ ] Balances: who owes who
-- [ ] Settle-up suggestions
-- [ ] End-of-trip summary + export
-- [ ] Offline entry, sync on reconnect
+- [x] Create group + invite by link or code
+- [x] Add expense: amount, payer, category, split (equal / shares / exact), receipt photo
+- [x] Expense list + filters
+- [x] Balances: who owes who
+- [x] Settle-up suggestions
+- [x] End-of-trip summary + export
+- [x] Offline entry, sync on reconnect
 
 ## Pre-departure checklist
-- [ ] Auto-generated from trip + vehicle + destination: passport, insurance, fuel, oil level, tire pressure, water, gear
-- [ ] Categories + progress
-- [ ] Add / edit custom items, assign to a group member
-- [ ] Reminders D-7 and D-1
-- [ ] Save as reusable template
+- [x] Auto-generated from trip + vehicle + destination: passport, insurance, fuel, oil level, tire pressure, water, gear
+- [x] Categories + progress
+- [x] Add / edit custom items, assign to a group member
+- [x] Reminders D-7 and D-1
+- [x] Save as reusable template
 
 ## Community
 - [ ] Feed of shared itineraries, filters: country, duration, budget, vehicle type, season

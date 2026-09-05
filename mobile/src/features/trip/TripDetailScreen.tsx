@@ -13,6 +13,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { RooviaMap } from "../map/RooviaMap";
 import { interpolateAlongRoute } from "../map/useMapRegion";
 import type { MapPinData } from "../map/types";
+import { useAuthStore } from "../../store/authStore";
 import { useGenerationStore } from "../../store/generationStore";
 import { useItineraryStore } from "../../store/itineraryStore";
 import { useSuggestionsStore } from "../../store/suggestionsStore";
@@ -21,8 +22,10 @@ import { useVehiclesStore } from "../../store/vehiclesStore";
 import type { Stop } from "../../mocks/itineraries";
 import { BudgetDashboard } from "./BudgetDashboard";
 import { BudgetSummary } from "./BudgetSummary";
+import { ChecklistSegment } from "./ChecklistSegment";
 import { DayCard } from "./DayCard";
 import { DaySelector } from "./DaySelector";
+import { ExpensesSegment } from "./ExpensesSegment";
 import { LivePositionBanner } from "./LivePositionBanner";
 import { StopDetailSheet } from "./StopDetailSheet";
 import { SuggestionCard } from "./SuggestionCard";
@@ -34,9 +37,7 @@ const REFINEMENTS: { key: "more_hiking" | "cheaper" | "less_driving"; label: str
   { key: "less_driving", label: "Moins de route", icon: "speedometer-outline" },
 ];
 
-const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire" | "budget">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
-  depenses: { icon: "people-outline", title: "Dépenses partagées", body: "Ajoutez et répartissez les dépenses du groupe ici, bientôt." },
-  checklist: { icon: "checkbox-outline", title: "Checklist", body: "La liste de départ générée pour ce voyage arrivera ici." },
+const PLACEHOLDER_COPY: Record<Exclude<TripSegment, "itineraire" | "budget" | "depenses" | "checklist">, { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }> = {
   journal: { icon: "book-outline", title: "Journal de voyage", body: "L'enregistrement de votre trajet et vos souvenirs, bientôt." },
   groupe: { icon: "people-circle-outline", title: "Groupe", body: "Invitez des co-voyageurs et partagez la position en direct, bientôt." },
 };
@@ -45,6 +46,9 @@ export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { theme } = useTheme();
+
+  const user = useAuthStore((s) => s.user);
+  const meName = user?.displayName || user?.email?.split("@")[0] || "Vous";
 
   const trip = useTripsStore((s) => s.trips.find((t) => t.id === id));
   const duplicateTrip = useTripsStore((s) => s.duplicate);
@@ -216,7 +220,11 @@ export default function TripDetailScreen() {
         segment={segment}
         onChangeSegment={setSegment}
       >
-        {!itinerary || !activeVersion ? (
+        {segment === "depenses" ? (
+          <ExpensesSegment tripId={trip.id} tripTitle={trip.title} meName={meName} />
+        ) : segment === "checklist" ? (
+          <ChecklistSegment tripId={trip.id} destination={trip.destination} nightsFromItinerary={activeVersion?.days.length} />
+        ) : !itinerary || !activeVersion ? (
           <EmptyState
             icon="map-outline"
             title="Pas encore d'itinéraire"

@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import SplashScreen from "../components/ui/SplashScreen";
 import { useAuthStore } from "../store/authStore";
+import { useChecklistStore } from "../store/checklistStore";
 import { useOnboardingStore } from "../store/onboardingStore";
 import { useProfileStore } from "../store/profileStore";
 import { useSettingsStore } from "../store/settingsStore";
@@ -22,12 +23,14 @@ export default function Index() {
   const hydrateTravelerProfile = useTravelerProfileStore((s) => s.hydrate);
   const hydrateVehicles = useVehiclesStore((s) => s.hydrate);
   const hydrateSettings = useSettingsStore((s) => s.hydrate);
+  const hydrateChecklist = useChecklistStore((s) => s.hydrate);
 
   useEffect(() => {
     hydrateOnboarding();
     hydrateAuth();
     hydrateVehicles();
     hydrateSettings();
+    hydrateChecklist();
     // Sequenced, not fired in parallel: `hydrateTravelerProfile` reads
     // `profileStore`'s state to seed itself on a first run (see that
     // store's own doc), so it has to wait for that read to actually land
@@ -36,7 +39,7 @@ export default function Index() {
       await hydrateProfile();
       await hydrateTravelerProfile();
     })();
-  }, [hydrateOnboarding, hydrateAuth, hydrateProfile, hydrateTravelerProfile, hydrateVehicles, hydrateSettings]);
+  }, [hydrateOnboarding, hydrateAuth, hydrateProfile, hydrateTravelerProfile, hydrateVehicles, hydrateSettings, hydrateChecklist]);
 
   const handleSplashComplete = () => {
     // `hasSeenOnboarding`/`isAuthenticated` can still be at their initial
