@@ -11,6 +11,7 @@ import { typography } from "../../constants/typography";
 import { useTheme } from "../../contexts/ThemeContext";
 import { initialsFrom } from "../../lib/initials";
 import { useAuthStore } from "../../store/authStore";
+import { useOnboardingStore } from "../../store/onboardingStore";
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -70,7 +71,10 @@ export default function AccountScreen() {
 
   const handleLogout = async () => {
     await logout();
-    router.replace("/auth/log-in" as any);
+    // Same precedence as `app/index.tsx`'s own routing (onboarding checked
+    // before auth) — see ProfileHubScreen's identical logout handler.
+    const seen = useOnboardingStore.getState().hasSeenOnboarding;
+    router.replace((seen ? "/auth/log-in" : "/onboarding") as any);
   };
 
   return (

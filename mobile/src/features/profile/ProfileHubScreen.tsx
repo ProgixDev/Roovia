@@ -13,6 +13,7 @@ import { initialsFrom } from "../../lib/initials";
 import { useAuthStore } from "../../store/authStore";
 import { useEntitlementsStore } from "../../store/entitlementsStore";
 import { useKidsStore } from "../../store/kidsStore";
+import { useOnboardingStore } from "../../store/onboardingStore";
 
 /**
  * The container for everything account-scoped that isn't trip-scoped —
@@ -28,6 +29,8 @@ export default function ProfileHubScreen() {
   const logout = useAuthStore((s) => s.logout);
   const enterKidsMode = useKidsStore((s) => s.enterKidsMode);
   const entitlement = useEntitlementsStore((s) => s.entitlement);
+  const hasSeenOnboarding = useOnboardingStore((s) => s.hasSeenOnboarding);
+  const resetOnboarding = useOnboardingStore((s) => s.reset);
   const [kidsGateOpen, setKidsGateOpen] = useState(false);
 
   const confirmLogout = () => {
@@ -38,10 +41,27 @@ export default function ProfileHubScreen() {
         style: "destructive",
         onPress: async () => {
           await logout();
-          router.replace("/auth/log-in" as any);
+          // If onboarding was reset (see below), this lands on `/onboarding`
+          // instead of the login screen — `app/index.tsx`'s own routing
+          // already checks `hasSeenOnboarding` before `isAuthenticated`,
+          // this just mirrors that same precedence here since logout skips
+          // that root screen and replaces straight to a route.
+          const seen = useOnboardingStore.getState().hasSeenOnboarding;
+          router.replace((seen ? "/auth/log-in" : "/onboarding") as any);
         },
       },
     ]);
+  };
+
+  const confirmResetOnboarding = () => {
+    Alert.alert(
+      "Réinitialiser l'onboarding ?",
+      "La prochaine déconnexion vous ramènera à l'écran d'accueil au lieu de la connexion.",
+      [
+        { text: "Annuler", style: "cancel" },
+        { text: "Réinitialiser", onPress: () => resetOnboarding() },
+      ],
+    );
   };
 
   return (
@@ -92,6 +112,13 @@ export default function ProfileHubScreen() {
               label="Mon abonnement"
               value={entitlement.active ? "Premium" : "Gratuit"}
               onPress={() => router.push("/plan" as any)}
+            />
+            <View style={[styles.divider, { backgroundColor: theme.colors.line }]} />
+            <ListRow
+              icon="refresh-outline"
+              label="Réinitialiser l'onboarding"
+              value={hasSeenOnboarding ? "Vu" : "Non vu"}
+              onPress={confirmResetOnboarding}
             />
           </View>
         </View>

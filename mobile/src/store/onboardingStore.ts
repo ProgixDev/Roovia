@@ -18,6 +18,12 @@ interface OnboardingState {
   hydrate(): Promise<void>;
   /** Marks onboarding as seen — call on "Skip" or the final slide's CTA alike. */
   markSeen(): Promise<void>;
+  /** Flips the flag back to unseen — a debug/support control (Profile tab),
+   * not a user-facing onboarding step. `app/index.tsx`'s routing already
+   * checks `hasSeenOnboarding` before `isAuthenticated`, so this alone is
+   * enough to make the next logout (or cold start) land on `/onboarding`
+   * instead of the login screen. */
+  reset(): Promise<void>;
 }
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
@@ -42,6 +48,15 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     } catch {
       // Best-effort persistence — the in-memory flag above already lets the
       // user through for this session even if the write fails.
+    }
+  },
+
+  async reset() {
+    set({ hasSeenOnboarding: false });
+    try {
+      await AsyncStorage.setItem(ONBOARDING_SEEN_KEY, "false");
+    } catch {
+      // Best-effort, same as markSeen — in-memory flag already flipped.
     }
   },
 }));
